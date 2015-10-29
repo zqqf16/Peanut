@@ -1,0 +1,175 @@
+body {
+    font-family: 'Georgia', Georgia, Times, serif;
+    line-height: 1.5;
+    text-rendering: optimizeLegibility;
+}
+
+h1, .h1 {
+    font-size: 2.6em;
+}
+
+h2, .h2 {
+    font-size: 2.3em;
+}
+
+h3, .h3 {
+    font-size: 1.15em;
+}
+
+h4, h5, h6 {
+    font-size: 1em;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Open Sans Condensed', sans-serif;
+    line-height: 1;
+}
+
+a {
+	color: #54D0ED;
+	text-decoration: none;
+}
+
+blockquote {
+	padding-left: 1.5em;
+	border-left: 4px solid #54D0ED;
+	margin-left: 0;
+}
+
+code, pre {
+	font-family: Monaco,Menlo,Consolas,"Courier New",monospace;
+	font-size: 0.8em;
+}
+
+code, .codehilite {
+	border: 1px solid #ddd;
+	background: #fafafa;
+}
+
+.codehilite {
+	padding: 0 0.4em;
+}
+
+.sidebar {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	background: #FF4A46;
+}
+
+.sidebar a {
+	color: #fafafa;
+}
+
+.sidebar .top,
+.sidebar .bottom {
+	padding: 2em;
+}
+
+.sidebar .top {
+	padding-top: 2.8em;
+	height: auto;
+	background: #181D2B;
+}
+
+.sidebar .top a {
+	color: #929eac;
+}
+
+.sidebar .bottom a {
+	color: #facac7;
+}
+
+.sidebar a:hover {
+	color: #fff;
+}
+
+.blog-title {
+	font-size: 2.8em;
+}
+
+.blog-desc {
+	display: block;
+	font-size: 0.4em;
+	margin: 0 0 2em;
+}
+
+ul.menu {
+	padding-left: 0;
+}
+
+.menu li {
+	list-style: none;
+}
+
+.nav a {
+	font-size: 1.5em;
+}
+
+.contact li {
+	display: inline-block;
+	padding-right: 0.5em;
+	height: 2em;
+}
+
+.contact a {
+	border: 2px solid #929eac;
+	padding: 0.2em 0.5em;
+	border-radius: 2px;
+}
+
+.content {
+	margin-left: 29.1667%;
+}
+
+.content-inner {
+	padding: 0 5%;
+}
+
+.post-meta {
+    display: inline-block;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 1em;
+    color: #9EABB3;
+}
+
+.post-list {
+	margin-top: 2em;
+	padding: 0;
+}
+
+.post-list li{
+	list-style: none;
+}
+article header h2 {
+	margin-bottom: 0.2em;
+}
+
+article header {
+	margin-bottom: 2em;
+}
+
+article img {
+	max-width: 100%;
+	display: block;
+	box-shadow: #999 2px 2px 4px;
+}
+
+.content footer {
+	margin: 4em 0 1em;
+}
+
+.content footer p {
+	display: inline-block;
+	margin:0;
+	font-size: 0.8em;
+}
+
+.post-title {
+	font-size: 1.8em;
+	margin-top: 0;
+}
+.post-title a {
+	color: #181D2B;
+}
