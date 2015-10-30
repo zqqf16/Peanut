@@ -1,3 +1,4 @@
-pygments
-mako
-markdown
+Markdown
+Pygments
+PyYAML
+six
