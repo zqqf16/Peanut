@@ -1,26 +1,24 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-blog = {
-    'domain': 'blog.zorro.im',
-    'title': u'穷折腾',
-    'description': u'Zorro的个人博客',
-    'sitemap': True,
-    'rss': True,
-}
+import yaml
+import codecs
 
-path = {
-    'drafts': 'drafts',
-    'html': 'html',
-    'static': 'static',
-    'post': 'posts',
-    'tag': 'tags',
-}
+try:
+    from yaml import CBaseLoader as Loader
+except ImportError:
+    from yaml import BaseLoader as Loader
 
-url = {
-    'post': 'posts/{slug}.html',
-    'tag': 'tags/{slug}.html',
-    'index': 'index.html',
-    'sitemap': 'sitemap.xml',
-    'rss': 'rss.xml',
-}
+
+class Config(object):
+    """Site configure"""
+
+    def __init__(self, path):
+        configs = {}
+        with codecs.open(path, 'r', encoding='utf-8') as f:
+            configs = yaml.load(f.read(), Loader)
+        self.title = configs.get('title')
+        self.host = configs.get('host')
+        self.description = configs.get('description')
+        self.theme = configs.get('theme')
+        self.path = configs.get('path')
