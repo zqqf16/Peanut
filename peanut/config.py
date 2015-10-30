@@ -3,6 +3,9 @@
 
 import os
 import codecs
+from os.path import join, isdir, isfile, curdir
+
+import peanut
 
 
 DEFAULT_CONFIG = {
@@ -47,6 +50,41 @@ class Config(dict):
     __setattr__ = __setitem__
 
 
+class ValidationError(Exception):
+    """Configurations validation exception"""
+    pass
+
+
+def verify_theme(config):
+    """Verify theme configurations"""
+
+    theme = config.theme
+    post = config.template['post']
+    index = config.template['index']
+
+    # search in current dir
+    local_path = join(curdir, theme)
+    if isdir(local_path):
+        if not isfile(join(local_path, post)):
+            raise ValidationError('Template for post not found in theme {}'.format(theme))
+        if not isfile(join(local_path, index)):
+            raise ValidationError('Template for index not found in theme {}'.format(theme))
+        return
+
+    # search in package
+    package_path = os.path.split(peanut.__file__)[0]
+    theme_path = join(package_path, 'templates', theme)
+    if not isdir(theme_path):
+        raise ValidationError('Theme named {} not found'.format(theme))
+
+
+def verify_config(config):
+    """Verifying configurations"""
+
+    verify_theme(config)
+    # TODO: other configs
+
+
 # Global config instance
 config = Config(DEFAULT_CONFIG)
 
@@ -72,3 +110,5 @@ def load(path):
     file_type = os.path.splitext(path)[1]
     if file_type.lower() in ('.yml', '.yaml'):
         config.update(_load_yaml(path))
+
+    verify_config(config)
