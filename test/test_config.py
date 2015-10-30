@@ -8,7 +8,7 @@ from __future__ import unicode_literals
 
 import os
 import unittest
-from peanut.config import Config
+from peanut.config import load, config
 
 
 def config_path():
@@ -18,6 +18,6 @@ def config_path():
 
 class TestConfig(unittest.TestCase):
     def test_load(self):
-        config = Config(config_path())
+        load(config_path())
         self.assertEqual(config.title, "Peanut Demo")
         self.assertEqual(config.path['draft'], 'drafts')
