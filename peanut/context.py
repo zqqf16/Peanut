@@ -3,6 +3,7 @@
 
 """Context for template rendering"""
 
+from datetime import datetime
 from peanut.config import config
 
 __all__ = ['filters']
@@ -17,6 +18,11 @@ def asset(value):
         asset_path += '/'
     return asset_path+value
 
+def strftime(value, date_format):
+    """Date formatter"""
+    return datetime.strftime(value, date_format)
+
 filters = {
-    'asset': asset
+    'asset': asset,
+    'strftime': strftime,
 }

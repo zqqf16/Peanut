@@ -6,16 +6,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     {# Page Meta #}
-    <title>{{site.title}}</title>
+    <title>{{ site.title }}</title>
     <meta name="description" content="{{ site.description }}" />
 
     <meta name="HandheldFriendly" content="True" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link rel="shortcut icon" href="{{ "favicon.ico"|asset }}">
+    <link rel="shortcut icon" href="{{ 'favicon.ico'|asset }}">
 
     {# Styles'n'Scripts #}
-    <link rel="stylesheet" type="text/css" href="{{ "css/screen.css"|asset }}" />
+    <link rel="stylesheet" type="text/css" href="{{ 'css/screen.css'|asset }}" />
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
 
     {# Ghost outputs important style and meta data with this tag #}
@@ -40,9 +40,9 @@
     {# ghost_foot #}
 
     <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
-    <script type="text/javascript" src="{{ "js/jquery.fitvids.js"|asset }}"></script>
+    <script type="text/javascript" src="{{ 'js/jquery.fitvids.js'|asset }}"></script>
     {# The main JavaScript file for Casper #}
-    <script type="text/javascript" src="{{ "js/index.js"|asset }}"></script>
+    <script type="text/javascript" src="{{ 'js/index.js'|asset }}"></script>
 
 </body>
 </html>

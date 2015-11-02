@@ -14,6 +14,11 @@ DEFAULT_CONFIG = {
     'description': 'A simple static blog generator',
     'sub_description': 'Enjoy python',
     'theme': 'defult',
+    'author': {
+        'image': 'https://avatars2.githubusercontent.com/u/655326?v=3&s=40',
+        'name': 'zqqf16',
+        'url': 'http://zorro.im/posts/about.html'
+    },
     'path': {
         'draft': 'drafts',
         'posts': 'posts',
