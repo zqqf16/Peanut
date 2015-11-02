@@ -1,7 +1,5 @@
 {% extends "default.html" %}
-
 {% block body %}
-
 {# The big featured header #}
 <header class="main-header {%if site.cover %}" style="background-image: url({{ site.cover }}){% else %}no-cover{% endif %}">
     <nav class="main-nav overlay clearfix">
@@ -31,5 +29,4 @@
     {% include 'loop.html' %}
 
 </main>
-
 {% endblock %}
