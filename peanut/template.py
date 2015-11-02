@@ -34,17 +34,20 @@ class SmartLoader(FileSystemLoader):
 class Template(object):
     """Template"""
 
-    def __init__(self, path, **kwargs):
+    def __init__(self, path, filters=None, **kwargs):
         loader = SmartLoader(path)
         self.env = jinja2.Environment(
             loader=loader,
             autoescape=True
         )
+        # Update filters
+        if isinstance(filters, dict):
+            self.env.filters.update(filters)
         # Update global namesapce
-        self.env.globals.update(kwargs)
+            self.env.globals.update(kwargs)
 
     def render(self, name, **context):
         """Render template with name and context"""
 
         template = self.env.get_template(name)
-        template.render(**context)
+        return template.render(**context)
