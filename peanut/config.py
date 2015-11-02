@@ -69,13 +69,18 @@ def verify_theme(config):
             raise ValidationError('Template for post not found in theme {}'.format(theme))
         if not isfile(join(local_path, index)):
             raise ValidationError('Template for index not found in theme {}'.format(theme))
+
+        # save theme path
+        config.theme_path = local_path
         return
 
     # search in package
     package_path = os.path.split(peanut.__file__)[0]
-    theme_path = join(package_path, 'templates', theme)
+    theme_path = join(package_path, 'themes', theme)
     if not isdir(theme_path):
         raise ValidationError('Theme named {} not found'.format(theme))
+
+    config.theme_path = theme_path
 
 
 def verify_config(config):

@@ -10,5 +10,5 @@ from jinja2 import ChoiceLoader, FileSystemLoader, PackageLoader
 
 loader = jinja2.ChoiceLoader([
     FileSystemLoader('/path/to/local/template'),
-    PackageLoader('peanut', 'templates/default')
+    PackageLoader('peanut', 'themes/default')
 ])

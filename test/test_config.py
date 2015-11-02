@@ -11,13 +11,14 @@ import unittest
 from peanut.config import load, config
 
 
-def config_path():
+def abs_path(path):
     curr_path = os.path.split(os.path.abspath(__file__))[0]
-    return os.path.join(curr_path, '../example/config.yml')
+    return os.path.abspath(os.path.join(curr_path, path))
 
 
 class TestConfig(unittest.TestCase):
     def test_load(self):
-        load(config_path())
+        load(abs_path('../example/config.yml'))
         self.assertEqual(config.title, "Peanut Demo")
         self.assertEqual(config.path['draft'], 'drafts')
+        self.assertEqual(config.theme_path, abs_path('../peanut/themes/default'))
