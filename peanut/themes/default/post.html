@@ -1,27 +1,89 @@
-## -*- coding: utf-8 -*-
-<%inherit file="base.html"/>
+{% extends "default.html" %}
+{% block body %}
 
-<%block name="header">
-${this.title} |
-</%block>
+{% include 'header.html' %}
 
-<%block name="main">
-<article class="main-content">
-    <div class="wrapper" itemscope itemtype="http://schema.org/Article">
-        <header class="section-header">
-            <h1 itemprop="headline" class="section-title">${this.title}</h1>
-            <span class="section-subtitle">
-                <address class="author">By <a itemprop="author" rel="author" href="/posts/about.html">${author}</a></address>
-                on <time itemprop="datePublished" content="${this.date.strftime('%Y-%m-%d')}" datetime="${this.date.strftime('%Y-%m-%d')}" pubdate="${this.date.strftime('%Y-%m-%d')}">${this.date.strftime('%Y-%m-%d')}</time>
-            </span>
+<main class="content" role="main">
+    <article class="{{post_class}}">
+
+        <header class="post-header">
+            <h1 class="post-title">{{ post.title }}</h1>
+            <section class="post-meta">
+                <time class="post-date" datetime="{{ post.date|strftime('%Y-%m-%d') }}">{{ post.date|strftime('%d %b %Y') }}</time>
+                {% if post.tags %}
+                    " on "
+                    {% for tag in post.tags %}
+                    <a href="{{ tag.url }}"> {{ tag.title }} </a>
+                    {% endfor %}
+                {% endif %}
+            </section>
         </header>
-        <section itemprop="articleBody" class="post-content">
-        	${this.content}
-        </section>
-        <div class="post-nav">
-    		<%include file="comment.html"/>
-    	</div>
-    </div>
 
-</article>
-</%block>
+        <section class="post-content">
+            {{ post.content }}
+        </section>
+
+        <footer class="post-footer">
+
+        {% if author.image %}
+        <figure class="author-image">
+            <a class="img" href="{{ author.url }}" style="background-image: url({{ author.image }})"><span class="hidden">{{ author.name }}'s Picture</span></a>
+        </figure>
+        {% endif %}
+
+        <section class="author">
+            <h4><a href="{{ author.url }}">{{ author.name }}</a></h4>
+            {% if author.bio %}
+                <p>{{ author.bio }}</p>
+            {% endif %}
+            <div class="author-meta">
+                {% if author.location%}
+                <span class="author-location icon-location">{{ author.location }}</span>
+                {% endif %}
+                {% if author.website %}
+                <span class="author-link icon-link"><a href="{{ author.website }}">{{ author.website }}</a></span>
+                {% endif %}
+            </div>
+        </section>
+
+            <section class="share">
+                <h4>Share this post</h4>
+                <a class="icon-twitter" href="https://twitter.com/intent/tweet?text={{ post.title|e }}&amp;url={{ post.url|absolute }}"
+                    onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                    <span class="hidden">Twitter</span>
+                </a>
+                <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u={{ post.url|absolute }}"
+                    onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                    <span class="hidden">Facebook</span>
+                </a>
+                <a class="icon-google-plus" href="https://plus.google.com/share?url={{ post.url|absolute }}"
+                   onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                    <span class="hidden">Google+</span>
+                </a>
+            </section>
+
+        </footer>
+
+    </article>
+</main>
+
+<aside class="read-next">
+    {% if next_post %}
+    <a class="read-next-story {% if next_post.image %}" style="background-image: url({{ next_post.image }}){% else %}no-cover{% endif %}" href="{{ next_post.url }}">
+        <section class="post">
+            <h2>{{next_post.title}}</h2>
+            <p>{{next_post.excerpt}}&hellip;</p>
+        </section>
+    </a>
+    {% endif %}
+    {% if prev_post %}
+    <a class="read-next-story prev {% if prev_post.image %}" style="background-image: url({{ prev_post.image }}){% else %}no-cover{% endif %}" href="{{ prev_post.url }}">
+        <section class="post">
+            <h2>{{ prev_post.title }}</h2>
+            <p>{{ prev_post.excerpt}}&hellip;</p>
+        </section>
+    </a>
+    {% endif %}
+</aside>
+
+{% endblock %}
