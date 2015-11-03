@@ -9,11 +9,11 @@ import peanut
 
 
 DEFAULT_CONFIG = {
-    'title': 'Peanut Demo',
-    'host': 'peanut.zorro.im',
-    'description': 'A simple static blog generator',
-    'sub_description': 'Enjoy python',
-    'theme': 'defult',
+    'site': {
+        'title': 'Peanut Demo',
+        'url': 'http://peanut.zorro.im',
+        'description': 'A simple static blog generator',
+    },
     'author': {
         'image': 'https://avatars2.githubusercontent.com/u/655326?v=3&s=40',
         'name': 'zqqf16',
@@ -21,20 +21,17 @@ DEFAULT_CONFIG = {
     },
     'path': {
         'draft': 'drafts',
-        'posts': 'posts',
+        'post': 'posts/{slug}.html',
+        'tag': 'tags/{slug}.html',
+        'category': 'category/{slug}.html',
+        'page': 'page/{slug}.html',
         'sitemap': 'sitemap.xml',
         'rss': 'rss.xml',
         'asset': '/asset/',
     },
     'sitemap': True,
     'rss': True,
-    'template': {
-        'post': 'post.html',
-        'tag': 'tag.html',
-        'sitemap': 'sitemap.xml',
-        'rss': 'rss.xml',
-        'index': 'index.xml',
-    }
+    'theme': 'defult',
 }
 
 
@@ -66,8 +63,8 @@ def verify_theme(config):
     """Verify theme configurations"""
 
     theme = config.theme
-    post = config.template['post']
-    index = config.template['index']
+    post = 'post.html'
+    index = 'index.html'
 
     # search in current dir
     local_path = join(curdir, theme)
@@ -90,10 +87,19 @@ def verify_theme(config):
     config.theme_path = theme_path
 
 
+def verify_path(config):
+    """Verify path configurations"""
+
+    draft = config.path['draft']
+    if not isdir(draft):
+        raise ValidationError('Draft path {} not found'.format(draft))
+
+
 def verify_config(config):
-    """Verifying configurations"""
+    """Verify configurations"""
 
     verify_theme(config)
+    verify_path(config)
     # TODO: other configs
 
 

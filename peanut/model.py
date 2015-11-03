@@ -7,8 +7,8 @@
 from six import with_metaclass
 from datetime import datetime
 
-from peanut import config
 from peanut import pool
+from peanut.config import config
 
 
 class BaseModel(with_metaclass(pool.ObjectPool, object)):
@@ -17,7 +17,8 @@ class BaseModel(with_metaclass(pool.ObjectPool, object)):
     # Pool identity key
     _identity = 'title'
 
-    layout = None
+    # layout
+    layout = 'page'
 
     @classmethod
     def all(cls):
@@ -32,6 +33,13 @@ class BaseModel(with_metaclass(pool.ObjectPool, object)):
     def __init__(self, title, slug):
         self.title = title
         self.slug = slug
+
+    @property
+    def url(self):
+        path = config.path[self.layout]
+        if not path:
+            raise KeyError('Path for {} not found'.format(self.layout))
+        return path.format(**self.__dict__)
 
 
 class Tag(BaseModel):
