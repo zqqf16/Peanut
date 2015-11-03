@@ -10,11 +10,11 @@
     <item>
 		<title>{{ post.title }}</title>
 		<link>{{ post.url|abs_path }}</link>
-		<description>${post.content | x}</description>
-		<author>Zqqf16</author>
+		<description>{{ post.content|e }}</description>
+		<author>{{ author.name }}</author>
 		<copyright></copyright>
-		<pubDate>${post.date.strftime("%a, %d %b %Y %H:%M:%S +0800")}</pubDate>
+		<pubDate>{{ post.date|strftime("%a, %d %b %Y %H:%M:%S +0800") }}</pubDate>
     </item>
-	%endfor
+	{% endfor %}
 </channel>
 </rss>
