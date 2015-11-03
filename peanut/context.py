@@ -3,13 +3,10 @@
 
 """Context for template rendering"""
 
-try:
-    from urllib.parse import urljoin
-except:
-    from urlparse import urljoin
 
 from datetime import datetime
 from peanut.config import config
+from peanut.utils import urljoin
 
 __all__ = ['filters']
 
