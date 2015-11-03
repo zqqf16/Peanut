@@ -1,0 +1,49 @@
+{# Previous/next page links - only displayed on page 2+ #}
+<div class="extra-pagination inner">
+    {% if pagination %}
+    <nav class="pagination" role="navigation">
+        <span class="page-number">Page 1 of 2</span>
+            <a class="newer-posts" href="/page/2/">Older Posts →</a>
+            <a class="older-posts" href="/page/2/">Older Posts →</a>
+        </span>
+    </nav>
+    {% endif %}
+</div>
+
+{% for post in posts %}
+<article class="{{ post_class }}">
+    <header class="post-header">
+        <h2 class="post-title">
+            <a href="{{ post.url }}">{{ post.title }}</a>
+        </h2>
+    </header>
+    <section class="post-excerpt">
+        <p>{{ post.excerpt }}
+            <a class="read-more" href="{{ post.url }}">&raquo;</a>
+        </p>
+    </section>
+    <footer class="post-meta">
+        {% if author.image %}
+        <img class="author-thumb" src="{{ author.image }}" alt="{{ author.name }}" nopin="nopin" />
+        {% endif %}
+        <a href="{{ author.url }}">{{ author.name }}</a>
+        {% if post.tags %}
+            " on "
+            {% for tag in post.tags %}
+            <a href="{{ tag.url }}"> {{ tag.title }} </a>
+            {% endfor %}
+        {% endif %}
+        <time class="post-date" datetime="{{ post.date|strftime('%Y-%m-%d') }}">
+            {{ post.date|strftime('%d %b %Y') }}</time>
+    </footer>
+</article>
+{% endfor %}
+
+{% if pagination %}
+<nav class="pagination" role="navigation">
+    <span class="page-number">Page 1 of 2</span>
+        <a class="newer-posts" href="/page/2/">Older Posts →</a>
+        <a class="older-posts" href="/page/2/">Older Posts →</a>
+    </span>
+</nav>
+{% endif %}

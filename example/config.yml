@@ -1,0 +1,7 @@
+title: Peanut Demo
+host: peanut.zorro.im
+description: A simple static blog generator
+theme: default
+path:
+    draft: drafts
+    target: posts
