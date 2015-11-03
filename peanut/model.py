@@ -88,11 +88,11 @@ class Post(BaseModel):
         self._tags = set()
         self._category = None
 
-        if not tags:
+        if tags:
             for tag in tags:
                 self.add_tag(tag)
 
-        if not category:
+        if category:
             self.category = category
 
     def add_tag(self, tag):
