@@ -16,6 +16,10 @@ class TestModel(unittest.TestCase):
         tag_b = Tag('hello')
 
         self.assertIs(tag_a, tag_b)
-        self.assertEqual(tag_a.title, 'hello')
-        self.assertEqual(tag_a.slug, 'hello')
-        self.assertEqual(tag_a.posts, [])
+
+    def test_base_model(self):
+        tag = Tag('test')
+        self.assertEqual(tag.title, 'test')
+        self.assertEqual(tag.slug, 'test')
+        self.assertEqual(tag.posts, [])
+        self.assertEqual(tag.url, 'tags/test.html')

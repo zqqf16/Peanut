@@ -1,0 +1,8 @@
+site:
+    title: Peanut Demo
+    url: http://peanut.zorro.im
+    description: A simple static blog generator
+theme: default
+path:
+    draft: drafts
+    post: posts/{slug}.html

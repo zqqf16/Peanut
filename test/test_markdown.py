@@ -14,7 +14,7 @@ class TestMarkdown(unittest.TestCase):
 
     def test_parser(self):
         md_reader = pr.MarkdownReader()
-        res = md_reader.read('./example/drafts/example.md')
+        res = md_reader.read('drafts/example.md')
         self.assertEqual(res['title'], 'This is my title')
         self.assertEqual(res['html'], '<p>这行是中文</p>')
         self.assertEqual(res['slug'], 'example.md')
