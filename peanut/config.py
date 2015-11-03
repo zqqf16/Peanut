@@ -40,9 +40,11 @@ class Config(dict):
     """Configurations"""
 
     def __init__(self, *args, **kwargs):
-        super(Config, self).__init__(*args, **kwargs)
+        self.update(*args, **kwargs)
 
     def __setitem__(self, key, value):
+        if isinstance(value, dict):
+            value = Config(value)
         return super(Config, self).__setitem__(key, value)
 
     def __getitem__(self, name):
@@ -53,6 +55,29 @@ class Config(dict):
 
     __getattr__ = __getitem__
     __setattr__ = __setitem__
+
+    def __real_update(self, key, value):
+        if self.get(key) and isinstance(self[key], Config):
+            if isinstance(value, dict):
+                value = Config(value)
+            if isinstance(value, Config):
+                self[key].update(value)
+            else:
+                self[key] = value
+        else:
+            self[key] = value
+
+    def update(self, *args, **kwargs):
+        if args:
+            if len(args) > 1:
+                raise TypeError('update expected at most 1 arguments, got {}'\
+                .format(len(args)))
+            arg = dict(args[0])
+            for key, value in arg.items():
+                self.__real_update(key, value)
+
+        for key, value in kwargs.items():
+            self.__real_update(key, value)
 
 
 class ValidationError(Exception):
