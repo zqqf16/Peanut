@@ -11,6 +11,7 @@ import peanut
 DEFAULT_CONFIG = {
     'site': {
         'title': 'Peanut Demo',
+        'logo': 'path_to_your_logo',
         'url': 'http://peanut.zorro.im',
         'description': 'A simple static blog generator',
     },
