@@ -42,34 +42,6 @@ class BaseModel(with_metaclass(pool.ObjectPool, object)):
         return path.format(**self.__dict__)
 
 
-class Tag(BaseModel):
-    """Tag"""
-
-    layout = 'tag'
-
-    def __init__(self, title, posts = None):
-        super(Tag, self).__init__(title=title, slug=title)
-        self._posts = set()
-
-        if posts:
-            for post in posts:
-                self.add_post(post)
-
-    @property
-    def posts(self):
-        """Get all posts belongs to this tag"""
-        return [Post.get(post) for post in self._posts]
-
-    def add_post(self, post):
-        self._posts.add(post.title)
-
-
-class Category(Tag):
-    """Category"""
-
-    layout = 'category'
-
-
 class Post(BaseModel):
     '''Post'''
 
@@ -99,6 +71,11 @@ class Post(BaseModel):
         """Add tag"""
         self._tags.add(tag.title)
 
+    @classmethod
+    def top_posts(cls):
+        """Get all top posts"""
+        return filter(lambda p: p.top, cls.all())
+
     @property
     def tags(self):
         """Get all tags"""
@@ -114,3 +91,28 @@ class Post(BaseModel):
             self._category = value.title
         else:
             self._category = None
+
+
+class Tag(BaseModel):
+    """Tag"""
+
+    layout = 'tag'
+
+    def __init__(self, title):
+        super(Tag, self).__init__(title=title, slug=title)
+
+    @property
+    def posts(self):
+        """Get all posts that have this tag"""
+        return filter(lambda p: self.title in p._tags, Post.all())
+
+
+class Category(Tag):
+    """Category"""
+
+    layout = 'category'
+
+    @property
+    def posts(self):
+        """Get all posts that belongs to this category"""
+        return filter(lambda p: p._category==self.title, Post.all())

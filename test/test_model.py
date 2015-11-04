@@ -21,7 +21,7 @@ class TestModel(unittest.TestCase):
         tag = Tag('test')
         self.assertEqual(tag.title, 'test')
         self.assertEqual(tag.slug, 'test')
-        self.assertEqual(tag.posts, [])
+        self.assertListEqual(list(tag.posts), [])
         self.assertEqual(tag.url, 'tags/test.html')
 
     def test_relationship(self):
@@ -29,13 +29,22 @@ class TestModel(unittest.TestCase):
         tag = Tag('test')
         category = Category('test')
 
-        tag.add_post(post)
         post.add_tag(tag)
-
-        category.add_post(post)
         post.category = category
 
         self.assertIn(tag, post.tags)
-        self.assertIn(post, tag.posts)
-        self.assertIn(post, category.posts)
+        self.assertIn(post, list(tag.posts))
+        self.assertIn(post, list(category.posts))
         self.assertIs(post.category, category)
+
+        category_new = Category('test_again')
+        post.category = category_new
+
+        self.assertIs(post.category, category_new)
+        self.assertListEqual(list(category.posts), [])
+
+
+    def test_post(self):
+        post_a = Post('Post a', 'post_a', top=False, publish=True)
+        post_b = Post('Post b', 'post_b', top=True, publish=False)
+        self.assertListEqual(list(Post.top_posts()), [post_b])
