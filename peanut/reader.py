@@ -36,7 +36,7 @@ def parser_bool(value):
         return False
 
 def parser_date(value):
-    date_string = parse_single(value)
+    date_string = parser_single(value)
     date = datetime.now()
     for date_format in ['%Y-%m-%d', '%Y%m%d', '%Y-%m-%d %H:%M', '%Y%m%d %H:%M']:
         try:

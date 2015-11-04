@@ -84,7 +84,8 @@ class Post(BaseModel):
     layout = 'post'
 
     def __init__(self, title, slug, content=None, date=None,
-                 publish=True, top=False, layout='post', tags=None, category=None):
+                 publish=True, top=False, layout='post',
+                 tags=None, category=None, **kwargs):
 
         super(Post, self).__init__(title=title, slug=title)
 
