@@ -52,16 +52,6 @@ from __future__ import unicode_literals
 from markdown import Extension
 from markdown.preprocessors import Preprocessor
 import yaml
-try:
-    from yaml import CBaseLoader as Loader
-except ImportError:
-    from yaml import BaseLoader as Loader
-
-
-# Override the default string handling function to always return unicode objects
-def construct_yaml_str(self, node):
-    return self.construct_scalar(node)
-Loader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
 
 
 class MetaYamlExtension (Extension):
@@ -95,7 +85,7 @@ class MetaYamlPreprocessor(Preprocessor):
         else:
             lines.insert(0, line)
         if yaml_block:
-            meta = yaml.load("\n".join(yaml_block), Loader)
+            meta = yaml.safe_load("\n".join(yaml_block))
 
             # Compat with PyMarkdown's meta: Keys are lowercase, values are lists
             meta = {k.lower(): v for k, v in meta.items()}

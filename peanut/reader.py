@@ -9,8 +9,41 @@ import re
 import codecs
 import markdown
 
+from datetime import datetime
 from six import with_metaclass
 from peanut.meta_yaml import MetaYamlExtension
+
+
+def parser_list(value):
+    if isinstance(value, list):
+        return value
+    else:
+        return [value]
+
+def parser_single(value):
+    if isinstance(value, list):
+        return value[0]
+    else:
+        return value
+
+def parser_bool(value):
+    value = parser_single(value)
+    if isinstance(value, bool):
+        return value
+    if value in ['True', 'true', 'Yes', 'yes']:
+        return True
+    else:
+        return False
+
+def parser_date(value):
+    date_string = parse_single(value)
+    date = datetime.now()
+    for date_format in ['%Y-%m-%d', '%Y%m%d', '%Y-%m-%d %H:%M', '%Y%m%d %H:%M']:
+        try:
+            date = datetime.strptime(date_string, date_format)
+        except ValueError:
+            pass
+    return date
 
 
 class Singleton(type):
@@ -37,6 +70,15 @@ class MarkdownReader(with_metaclass(Singleton, Reader)):
     """
 
     regex = re.compile(r'([^/]+)\.(MD|md|[mM]arkdown)')
+
+    # Meta data parser
+    _meta_parser = {
+        'tags': parser_list,
+        'category': parser_single,
+        'date': parser_date,
+        'publish': parser_bool,
+        'top': parser_bool,
+    }
 
     def __init__(self):
         self.md_parser = MarkdownReader.__create_md_reader()
@@ -66,6 +108,13 @@ class MarkdownReader(with_metaclass(Singleton, Reader)):
     def parser(self):
         return self.md_parser.reset()
 
+    def parse_meta(self, meta):
+        new_meta = {}
+        for key, value in meta.items():
+            parser = self._meta_parser.get(key, parser_single)
+            new_meta[key] = parser(value)
+        return new_meta
+
     def read(self, path):
         if not os.path.isfile(path):
             # is not a file
@@ -80,7 +129,7 @@ class MarkdownReader(with_metaclass(Singleton, Reader)):
 
         res.update({'content': content, 'html': html})
         if self.md_parser.Meta:
-            res.update(self.md_parser.Meta)
+            res.update(self.parse_meta(self.md_parser.Meta))
 
         return res
 

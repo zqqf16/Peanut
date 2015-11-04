@@ -1,7 +1,8 @@
 ---
 title: This is my title
 layout: post
-publish: Yes
+publish: true
+top: false
 tags:
     - example
     - test
