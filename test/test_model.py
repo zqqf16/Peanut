@@ -11,12 +11,6 @@ from peanut.model import Post, Tag, Category
 
 
 class TestModel(unittest.TestCase):
-    def test_pool(self):
-        tag_a = Tag('hello')
-        tag_b = Tag('hello')
-
-        self.assertIs(tag_a, tag_b)
-
     def test_base_model(self):
         tag = Tag('test')
         self.assertEqual(tag.title, 'test')
@@ -25,9 +19,9 @@ class TestModel(unittest.TestCase):
         self.assertEqual(tag.url, 'tags/test.html')
 
     def test_relationship(self):
-        post = Post('Hello world', 'hello_world')
-        tag = Tag('test')
-        category = Category('test')
+        post = Post.create('Hello world', 'hello_world')
+        tag = Tag.create('test')
+        category = Category.create('test')
 
         post.add_tag(tag)
         post.category = category
@@ -37,7 +31,7 @@ class TestModel(unittest.TestCase):
         self.assertIn(post, list(category.posts))
         self.assertIs(post.category, category)
 
-        category_new = Category('test_again')
+        category_new = Category.create('test_again')
         post.category = category_new
 
         self.assertIs(post.category, category_new)
@@ -45,6 +39,6 @@ class TestModel(unittest.TestCase):
 
 
     def test_post(self):
-        post_a = Post('Post a', 'post_a', top=False, publish=True)
-        post_b = Post('Post b', 'post_b', top=True, publish=False)
-        self.assertListEqual(list(Post.top_posts()), [post_b])
+        post_a = Post.create('Post a', 'post_a', top=False, publish=True)
+        post_b = Post.create('Post b', 'post_b', top=True, publish=False)
+        self.assertListEqual(list(Post.all(lambda p: p.top)), [post_b])

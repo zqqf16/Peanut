@@ -4,14 +4,26 @@
 """Post, Tag and Category
 """
 
+import inspect
+
 from six import with_metaclass
 from datetime import datetime
 
-from peanut import pool
 from peanut.config import config
 
 
-class BaseModel(with_metaclass(pool.ObjectPool, object)):
+class ObjectPool(type):
+    """Meta class to implement a simple "object pool".
+    """
+
+    def __new__(mcs, name, bases, attrs):
+        """Add an attribute "_pool".
+        """
+        attrs['_pool'] = {}
+        return super(ObjectPool, mcs).__new__(mcs, name, bases, attrs)
+
+
+class BaseModel(with_metaclass(ObjectPool, object)):
     """Base model"""
 
     # Pool identity key
@@ -22,13 +34,37 @@ class BaseModel(with_metaclass(pool.ObjectPool, object)):
 
     @classmethod
     def all(cls):
-        """For pool"""
-        pass
+        """Get all instance from pool"""
+        return cls._pool.values()
 
     @classmethod
     def get(cls, identity):
-        """For pool"""
-        pass
+        """Get an instance from pool by identity"""
+        return cls._pool.get(identity)
+
+    @classmethod
+    def create(cls, *args, **kwargs):
+        """Create an instance"""
+        instance = cls(*args, **kwargs)
+        cls._pool[instance.identity] = instance
+        return instance
+
+    @classmethod
+    def get_or_create(cls, *args, **kwargs):
+        """Get an instance from pool, if does not exist, create a new one"""
+        id_key = getattr(cls, '_identity', None)
+        call_args = inspect.getcallargs(cls.__init__, None, *args, **kwargs)
+        identity = call_args.get(id_key)
+        instance = cls.get(identity, None)
+        return instance or cls.create(*args, **kwargs)
+
+    @classmethod
+    def add(cls, instance):
+        cls._pool[instance.identity] = instance
+
+    @property
+    def identity(self):
+        return self.__dict__[self._identity]
 
     def __init__(self, title, slug):
         self.title = title
@@ -70,6 +106,14 @@ class Post(BaseModel):
     def add_tag(self, tag):
         """Add tag"""
         self._tags.add(tag.title)
+
+    @classmethod
+    def all(cls, post_filter=None):
+        """Get all posts
+        @param post_filter: a callable filter
+        @return: post list
+        """
+        return filter(post_filter, super(Post, cls).all())
 
     @classmethod
     def top_posts(cls):
