@@ -33,6 +33,20 @@ class TestMarkdown(unittest.TestCase):
         r2 = pr.reader_for_file('b.unknow')
         self.assertIsNone(r2)
 
+    def test_meta_parser(self):
+        self.assertEqual(pr.parser_single('hello'), 'hello')
+        self.assertEqual(pr.parser_single(['hello', 'world']), 'hello')
+
+        self.assertListEqual(pr.parser_list('hello'), ['hello'])
+        self.assertListEqual(pr.parser_list(['hello', 'world']),
+                ['hello', 'world'])
+
+        for value in ['Yes', 'yes', 'true', 'True', True]:
+            self.assertTrue(pr.parser_bool(value))
+        for value in ['No', 'no', 'false', 'False', False]:
+            self.assertFalse(pr.parser_bool(value))
+
+
 
 if __name__ == '__main__':
     unittest.main()
