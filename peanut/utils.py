@@ -20,6 +20,26 @@ def package_resource(path):
     return os.path.abspath(os.path.join(curr_path, path))
 
 
+def neighborhood(alist):
+    """Get neighborhood when looping"""
+
+    length = len(alist)
+    if length == 0:
+        return
+
+    prev = None
+    curr = None
+    next = None
+
+    for i, curr in enumerate(alist):
+        if i > 0:
+            prev = alist[i-1]
+        if i+1 < length:
+            next = alist[i+1]
+        yield (prev, curr, next)
+    yield (prev, curr, None)
+
+
 def walk_directory(path, abs_path=True):
     """Generate directory tree
 

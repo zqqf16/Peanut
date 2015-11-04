@@ -127,11 +127,15 @@ config = Config({
         'logo': 'path_to_your_logo',
         'url': 'http://peanut.zorro.im',
         'description': 'A simple static blog generator',
+        'navigation': False,
     },
     'author': {
         'image': 'https://avatars2.githubusercontent.com/u/655326?v=3&s=40',
         'name': 'zqqf16',
-        'url': 'http://zorro.im/posts/about.html'
+        'url': 'http://zorro.im/posts/about.html',
+        'bio': 'Pythoner',
+        'location': 'Beijing',
+        'website': 'http://zorro.im',
     },
     'path': {
         'draft': 'drafts',

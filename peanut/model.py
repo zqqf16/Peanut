@@ -104,6 +104,9 @@ class Post(BaseModel):
         if category:
             self.category = category
 
+    def __lt__(self, value):
+        return self.date < value.date
+
     def add_tag(self, tag):
         """Add tag"""
         self._tags.add(tag.title)
@@ -114,7 +117,8 @@ class Post(BaseModel):
         @param post_filter: a callable filter
         @return: post list
         """
-        return filter(post_filter, super(Post, cls).all())
+        posts = list(filter(post_filter, super(Post, cls).all()))
+        return sorted(posts, reverse=True)
 
     @classmethod
     def top_posts(cls):
