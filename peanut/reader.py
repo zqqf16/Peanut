@@ -120,7 +120,7 @@ class MarkdownReader(with_metaclass(Singleton, Reader)):
             # is not a file
             return None
 
-        file_name = os.path.basename(path)
+        file_name = os.path.basename(path).split('.')[0]
         res = {'slug': file_name}
 
         with codecs.open(path, 'r', encoding='utf-8') as f:
