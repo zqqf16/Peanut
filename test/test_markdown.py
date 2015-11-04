@@ -18,7 +18,7 @@ class TestMarkdown(unittest.TestCase):
         self.assertEqual(res['publish'], True)
         self.assertEqual(res['top'], False)
         self.assertEqual(res['title'], 'This is my title')
-        self.assertEqual(res['html'], '<p>这行是中文</p>')
+        self.assertEqual(res['content'], '<p>这行是中文</p>')
         self.assertEqual(res['slug'], 'example.md')
         self.assertIn('example', res['slug'])
 

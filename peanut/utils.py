@@ -4,8 +4,10 @@
 import os
 try:
     from urllib.parse import urljoin
+    from urllib.request import pathname2url, url2pathname
 except:
     from urlparse import urljoin
+    from urllib import pathname2url, url2pathname
 
 
 def package_resource(path):

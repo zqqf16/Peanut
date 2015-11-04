@@ -124,10 +124,10 @@ class MarkdownReader(with_metaclass(Singleton, Reader)):
         res = {'slug': file_name}
 
         with codecs.open(path, 'r', encoding='utf-8') as f:
-            content = f.read()
-            html = self.parser.convert(content.strip(' \n'))
+            draft = f.read()
+            content = self.parser.convert(draft.strip(' \n'))
 
-        res.update({'content': content, 'html': html})
+        res.update({'content': content, 'draft': draft})
         if self.md_parser.Meta:
             res.update(self.parse_meta(self.md_parser.Meta))
 

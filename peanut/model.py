@@ -10,6 +10,7 @@ from six import with_metaclass
 from datetime import datetime
 
 from peanut.config import config
+from peanut.utils import pathname2url
 
 
 class ObjectPool(type):
@@ -72,10 +73,18 @@ class BaseModel(with_metaclass(ObjectPool, object)):
 
     @property
     def url(self):
-        path = config.path[self.layout]
-        if not path:
+        path = self.file_path
+        if path[0] is not '/':
+            path = '/' + path
+        return pathname2url(path)
+
+    @property
+    def file_path(self):
+        template = config.path[self.layout]
+        if not template:
             raise KeyError('Path for {} not found'.format(self.layout))
-        return path.format(**self.__dict__)
+
+        return template.format(**self.__dict__)
 
 
 class Post(BaseModel):
@@ -87,7 +96,7 @@ class Post(BaseModel):
                  publish=True, top=False, layout='post',
                  tags=None, category=None, **kwargs):
 
-        super(Post, self).__init__(title=title, slug=title)
+        super(Post, self).__init__(title=title, slug=slug)
 
         self.content = content
         self.date = date or datetime.now()

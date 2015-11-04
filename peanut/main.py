@@ -2,13 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import os
+import codecs
 
 import peanut.reader as reader
 from peanut.config import config
 from peanut.model import Tag, Category, Post
 from peanut.template import Template
 from peanut.context import filters
-from peanut.utils import neighborhood
+from peanut.utils import neighborhood, url2pathname
 
 def render_post(template, post):
     template.render(post.layout, post=post)
@@ -35,7 +36,18 @@ def generate():
 
     #posts
     for prev, post, next in neighborhood(Post.all()):
-        template.render(post.layout, post=post, prev_post=prev, next_post=next)
+        content = template.render(post.layout, post=post,
+                prev_post=prev, next_post=next)
+        write_html(post.file_path, content)
+
+
+def write_html(path, content):
+    """Write HTML file"""
+
+    path = os.path.join(config.curdir, path)
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with codecs.open(path, 'w') as f:
+        f.write(content)
 
 
 def create_post(draft):

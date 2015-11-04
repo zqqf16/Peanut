@@ -145,7 +145,7 @@ config = Config({
         'page': 'page/{slug}.html',
         'sitemap': 'sitemap.xml',
         'rss': 'rss.xml',
-        'asset': '/asset/',
+        'asset': '/assets/',
     },
     'sitemap': True,
     'rss': True,
