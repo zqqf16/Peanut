@@ -9,7 +9,6 @@ import inspect
 from six import with_metaclass
 from datetime import datetime
 
-from peanut.config import config
 from peanut.utils import pathname2url
 
 
@@ -28,10 +27,13 @@ class BaseModel(with_metaclass(ObjectPool, object)):
     """Base model"""
 
     # Pool identity key
-    _identity = 'title'
+    _identity = 'slug'
 
     # layout
     layout = 'page'
+
+    # file path template
+    path_template = '{slug}.html'
 
     @classmethod
     def all(cls):
@@ -74,17 +76,13 @@ class BaseModel(with_metaclass(ObjectPool, object)):
     @property
     def url(self):
         path = self.file_path
-        if path[0] is not '/':
+        if not path.startswith('/'):
             path = '/' + path
         return pathname2url(path)
 
     @property
     def file_path(self):
-        template = config.path[self.layout]
-        if not template:
-            raise KeyError('Path for {} not found'.format(self.layout))
-
-        return template.format(**self.__dict__)
+        return self.path_template.format(**self.__dict__)
 
 
 class SinglePage(BaseModel):
@@ -136,7 +134,7 @@ class Post(BaseModel):
     @classmethod
     def top_posts(cls):
         """Get all top posts"""
-        return filter(lambda p: p.top, cls.all())
+        return cls.all(lambda p: p.top)
 
     @property
     def tags(self):
