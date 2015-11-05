@@ -45,6 +45,11 @@ class Template(object):
         # Update global namesapce
             self.env.globals.update(kwargs)
 
+    def update_context(self, **kwargs):
+        """Update global context
+        """
+        self.env.globals.update(kwargs)
+
     def render(self, name, **context):
         """Render template with name and context"""
 
