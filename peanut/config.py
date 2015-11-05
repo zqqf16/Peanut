@@ -136,10 +136,9 @@ def default_config():
             'author': {
                 'image': 'https://avatars2.githubusercontent.com/u/655326?v=3&s=40',
                 'name': 'zqqf16',
-                'url': 'http://zorro.im/posts/about.html',
+                'url': 'http://blog.zorro.im/posts/about.html',
                 'bio': 'Pythoner',
                 'location': 'Beijing',
-                'website': 'http://zorro.im',
             },
             'path': {
                 'draft': 'drafts',
