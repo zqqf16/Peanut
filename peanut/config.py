@@ -152,5 +152,5 @@ def default_config():
             },
             'sitemap': True,
             'rss': True,
-            'theme': 'defult',
+            'theme': 'default',
     })
