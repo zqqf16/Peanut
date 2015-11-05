@@ -8,8 +8,8 @@ import os
 import six
 import re
 import markdown
+import datetime
 
-from datetime import datetime
 from six import with_metaclass
 from peanut.meta_yaml import MetaYamlExtension
 
@@ -36,13 +36,16 @@ def parser_bool(value):
         return False
 
 def parser_date(value):
+    if isinstance(value, datetime.datetime):
+        return value
+    if isinstance(value, datetime.date):
+        return datetime.datetime(value.year, value.month, value.day)
+
     date_string = parser_single(value)
-    if six.PY2:
-        date_string = date_string.encode('utf-8')
-    date = datetime.now()
+    date = datetime.datetime.now()
     for date_format in ['%Y-%m-%d', '%Y%m%d', '%Y-%m-%d %H:%M', '%Y%m%d %H:%M']:
         try:
-            date = datetime.strptime(date_string, date_format)
+            date = datetime.datetime.strptime(date_string, date_format)
         except:
             pass
     return date
