@@ -4,12 +4,14 @@
 """Post, Tag and Category
 """
 
+from __future__ import unicode_literals
+
 import inspect
 
 from six import with_metaclass
 from datetime import datetime
 
-from peanut.utils import pathname2url
+from peanut.utils import path_to_url
 
 
 class ObjectPool(type):
@@ -33,7 +35,7 @@ class BaseModel(with_metaclass(ObjectPool, object)):
     layout = 'page'
 
     # file path template
-    path_template = '{slug}.html'
+    path_template = u'{slug}.html'
 
     @classmethod
     def all(cls):
@@ -78,11 +80,16 @@ class BaseModel(with_metaclass(ObjectPool, object)):
         path = self.file_path
         if not path.startswith('/'):
             path = '/' + path
-        return pathname2url(path)
+        return path_to_url(path)
 
     @property
     def file_path(self):
-        return self.path_template.format(**self.__dict__)
+        try:
+            return self.path_template.format(**self.__dict__)
+        except:
+            print(self.title)
+            print(self.__dict__)
+            exit()
 
 
 class SinglePage(BaseModel):

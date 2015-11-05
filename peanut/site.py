@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-import codecs
+import six
 
 import peanut
 import peanut.reader as reader
@@ -164,8 +164,11 @@ class Site(object):
             os.makedirs(os.path.dirname(path))
         except OSError:
             pass
-        with codecs.open(path, 'w', encoding='utf-8') as f:
-            f.write(content)
+        with open(path, 'w') as f:
+            if six.PY2:
+                f.write(content.encode('utf-8'))
+            else:
+                f.write(content)
 
     def generate(self):
         """Generate static site

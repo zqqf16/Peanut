@@ -5,8 +5,8 @@
 """
 
 import os
+import six
 import re
-import codecs
 import markdown
 
 from datetime import datetime
@@ -41,7 +41,7 @@ def parser_date(value):
     for date_format in ['%Y-%m-%d', '%Y%m%d', '%Y-%m-%d %H:%M', '%Y%m%d %H:%M']:
         try:
             date = datetime.strptime(date_string, date_format)
-        except ValueError:
+        except:
             pass
     return date
 
@@ -124,8 +124,10 @@ class MarkdownReader(with_metaclass(Singleton, Reader)):
         file_name = os.path.basename(path).split('.')[0]
         res = {'slug': file_name}
 
-        with codecs.open(path, 'r', encoding='utf-8') as f:
+        with open(path, 'r') as f:
             draft = f.read()
+            if six.PY2:
+                draft = draft.decode('utf-8')
             content = self.parser.convert(draft.strip(' \n'))
 
         res.update({'content': content, 'draft': draft})
