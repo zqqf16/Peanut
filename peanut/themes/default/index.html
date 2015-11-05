@@ -1,4 +1,5 @@
 {% extends "default.html" %}
+{% block body_class %}home-template{% endblock %}
 {% block body %}
 {# The big featured header #}
 <header class="main-header {%if site.cover %}" style="background-image: url({{ site.cover }}){% else %}no-cover{% endif %}">
@@ -25,8 +26,6 @@
 
 {# The main content area on the homepage #}
 <main id="content" class="content" role="main">
-
-    {% include 'loop.html' %}
-
+    {% include "loop.html" %}
 </main>
 {% endblock %}

@@ -1,11 +1,15 @@
 {% extends "default.html" %}
+{% block body_class %}post-template tag-fables{% endblock %}
+{% block header %}
+<link rel="stylesheet" type="text/css" href="{{ 'css/pygments.css'|asset }}" />
+{% endblock %}
+
 {% block body %}
 
+{% set image = post.image %}
 {% include 'header.html' %}
-
 <main class="content" role="main">
     <article class="post {{post_class}}">
-
         <header class="post-header">
             <h1 class="post-title">{{ post.title }}</h1>
             <section class="post-meta">
@@ -18,19 +22,15 @@
                 {% endif %}
             </section>
         </header>
-
         <section class="post-content">
             {{ post.content }}
         </section>
-
         <footer class="post-footer">
-
         {% if author.image %}
         <figure class="author-image">
             <a class="img" href="{{ author.url }}" style="background-image: url({{ author.image }})"><span class="hidden">{{ author.name }}'s Picture</span></a>
         </figure>
         {% endif %}
-
         <section class="author">
             <h4><a href="{{ author.url }}">{{ author.name }}</a></h4>
             {% if author.bio %}
@@ -45,7 +45,6 @@
                 {% endif %}
             </div>
         </section>
-
             <section class="share">
                 <h4>Share this post</h4>
                 <a class="icon-twitter" href="https://twitter.com/intent/tweet?text={{ post.title|e }}&amp;url={{ post.url|abs_url }}"
@@ -61,12 +60,9 @@
                     <span class="hidden">Google+</span>
                 </a>
             </section>
-
         </footer>
-
     </article>
 </main>
-
 <aside class="read-next">
     {% if next_post %}
     <a class="read-next-story {% if next_post.image %}" style="background-image: url({{ next_post.image }}){% else %}no-cover{% endif %}" href="{{ next_post.url }}">
@@ -85,5 +81,4 @@
     </a>
     {% endif %}
 </aside>
-
 {% endblock %}
