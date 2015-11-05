@@ -78,6 +78,7 @@ class MarkdownReader(with_metaclass(Singleton, Reader)):
         'date': parser_date,
         'publish': parser_bool,
         'top': parser_bool,
+        'image': parser_single,
     }
 
     def __init__(self):
@@ -111,7 +112,7 @@ class MarkdownReader(with_metaclass(Singleton, Reader)):
     def parse_meta(self, meta):
         new_meta = {}
         for key, value in meta.items():
-            parser = self._meta_parser.get(key, parser_single)
+            parser = self._meta_parser.get(key, lambda v: v)
             new_meta[key] = parser(value)
         return new_meta
 
