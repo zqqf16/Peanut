@@ -76,7 +76,7 @@ class Config(dict):
             return
 
         self.verify()
-        return config
+        return self
 
     def verify(self):
         """Verify configurations"""
@@ -121,35 +121,36 @@ class Config(dict):
 
 
 # Global config instance
-config = Config({
-    'site': {
-        'title': 'Peanut Demo',
-        'logo': 'path_to_your_logo',
-        'cover': None,
-        'url': 'http://peanut.zorro.im',
-        'description': 'A simple static blog generator',
-        'navigation': False,
-    },
-    'author': {
-        'image': 'https://avatars2.githubusercontent.com/u/655326?v=3&s=40',
-        'name': 'zqqf16',
-        'url': 'http://zorro.im/posts/about.html',
-        'bio': 'Pythoner',
-        'location': 'Beijing',
-        'website': 'http://zorro.im',
-    },
-    'path': {
-        'draft': 'drafts',
-        'post': 'posts/{slug}.html',
-        'tag': 'tags/{slug}.html',
-        'category': 'category/{slug}.html',
-        'page': 'page/{slug}.html',
-        'index': 'index.html',
-        'sitemap': 'sitemap.xml',
-        'rss': 'rss.xml',
-        'asset': '/assets/',
-    },
-    'sitemap': True,
-    'rss': True,
-    'theme': 'defult',
-})
+def default_config():
+    return Config({
+            'site': {
+                'title': 'Peanut Demo',
+                'logo': 'path_to_your_logo',
+                'cover': None,
+                'url': 'http://peanut.zorro.im',
+                'description': 'A simple static blog generator',
+                'navigation': False,
+            },
+            'author': {
+                'image': 'https://avatars2.githubusercontent.com/u/655326?v=3&s=40',
+                'name': 'zqqf16',
+                'url': 'http://zorro.im/posts/about.html',
+                'bio': 'Pythoner',
+                'location': 'Beijing',
+                'website': 'http://zorro.im',
+            },
+            'path': {
+                'draft': 'drafts',
+                'post': 'posts/{slug}.html',
+                'tag': 'tags/{slug}.html',
+                'category': 'category/{slug}.html',
+                'page': 'page/{slug}.html',
+                'index': 'index.html',
+                'sitemap': 'sitemap.xml',
+                'rss': 'rss.xml',
+                'asset': '/assets/',
+            },
+            'sitemap': True,
+            'rss': True,
+            'theme': 'defult',
+    })
