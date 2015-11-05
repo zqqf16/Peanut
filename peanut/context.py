@@ -3,17 +3,14 @@
 
 """Context for template rendering"""
 
-
+from functools import partial
 from datetime import datetime
-from peanut.config import config
 from peanut.utils import urljoin
-
-__all__ = ['filters']
 
 
 # Filters
 
-def asset(value):
+def asset(config, value):
     """Get asset file url"""
     asset_path = config.path['asset']
     return urljoin(asset_path, value)
@@ -22,12 +19,15 @@ def strftime(value, date_format):
     """Date formatter"""
     return datetime.strftime(value, date_format)
 
-def abs_url(value):
+def abs_url(config, value):
     """Absolute url"""
     return urljoin(config.site['url'], value)
 
-filters = {
-    'asset': asset,
-    'strftime': strftime,
-    'abs_url': abs_url,
-}
+def get_filters(config):
+    """Get all filters
+    """
+    return {
+        'asset': partial(asset, config),
+        'strftime': strftime,
+        'abs_url': partial(abs_url, config),
+    }
