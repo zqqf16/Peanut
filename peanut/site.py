@@ -93,6 +93,7 @@ class Site(object):
         # Create index, rss and sitemap
         for page in ('index', 'rss', 'sitemap'):
             single_page = SinglePage.create(page, page)
+            single_page.layout = page
             single_page.path_template = self.config.path[page]
 
 
@@ -153,14 +154,17 @@ class Site(object):
     def render_single_page(self, page):
         """Render single page
         """
-        return self.template.render(page.layout)
+        return self.template.render(page.layout, posts=self.posts)
 
     def write_html(self, item, content):
         """Write HTML file"""
 
         path = os.path.join(self.config.curdir, item.file_path)
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        with codecs.open(path, 'w') as f:
+        try:
+            os.makedirs(os.path.dirname(path))
+        except OSError:
+            pass
+        with codecs.open(path, 'w', encoding='utf-8') as f:
             f.write(content)
 
     def generate(self):
