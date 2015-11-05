@@ -71,7 +71,7 @@ class BaseModel(with_metaclass(ObjectPool, object)):
 
     def __init__(self, title, slug):
         self.title = title
-        self.slug = slug
+        self.slug = slug.replace(' ', '_')
 
     @property
     def url(self):
