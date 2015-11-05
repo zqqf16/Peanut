@@ -13,11 +13,12 @@ from peanut.model import Post, Tag, Category
 class TestModel(unittest.TestCase):
     def test_base_model(self):
         tag = Tag('test')
+        Tag.path_template = '/tags/{slug}.html'
         self.assertEqual(tag.title, 'test')
         self.assertEqual(tag.slug, 'test')
         self.assertListEqual(list(tag.posts), [])
         self.assertEqual(tag.url, '/tags/test.html')
-        self.assertEqual(tag.file_path, 'tags/test.html')
+        self.assertEqual(tag.file_path, '/tags/test.html')
 
     def test_relationship(self):
         post = Post.create('Hello world', 'hello_world')

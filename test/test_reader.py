@@ -7,20 +7,49 @@
 from __future__ import unicode_literals
 
 import unittest
+import codecs
+
+from datetime import datetime
+
 import peanut.reader as pr
 
 
 class TestMarkdown(unittest.TestCase):
 
+    def setUp(self):
+        md = '''\
+---
+title: Hello world
+tags:
+    - test
+    - life
+category: [test, useless]
+publish: Yes
+top: No
+layout: post
+date: 2015-11-5 16:56
+cover: 'path/to/cover'
+others:
+    showTitle: Yes
+---
+我能吞下玻璃却不伤身体
+'''
+        with codecs.open('/var/tmp/test_markdown.md', 'w', encoding='utf-8') as f:
+            f.write(md)
+
     def test_parser(self):
-        md_reader = pr.MarkdownReader()
-        res = md_reader.read('drafts/example.md')
-        self.assertEqual(res['publish'], True)
-        self.assertEqual(res['top'], False)
-        self.assertEqual(res['title'], 'This is my title')
-        self.assertEqual(res['content'], '<p>这行是中文</p>')
-        self.assertEqual(res['slug'], 'example.md')
-        self.assertIn('example', res['slug'])
+        reader = pr.MarkdownReader()
+        draft = reader.read('/var/tmp/test_markdown.md')
+        self.assertEqual(draft['publish'], True)
+        self.assertEqual(draft['top'], False)
+        self.assertEqual(draft['title'], 'Hello world')
+        self.assertEqual(draft['content'], '<p>我能吞下玻璃却不伤身体</p>')
+        self.assertIn('test', draft['tags'])
+        self.assertIn('life', draft['tags'])
+        self.assertEqual(draft['cover'], 'path/to/cover')
+        self.assertDictEqual(draft['others'], {'showTitle': True})
+        self.assertIn('test_markdown', draft['slug'])
+        self.assertIsInstance(draft['date'], datetime)
 
     def test_get_reader(self):
         reader = None
@@ -32,20 +61,6 @@ class TestMarkdown(unittest.TestCase):
 
         r2 = pr.reader_for_file('b.unknow')
         self.assertIsNone(r2)
-
-    def test_meta_parser(self):
-        self.assertEqual(pr.parser_single('hello'), 'hello')
-        self.assertEqual(pr.parser_single(['hello', 'world']), 'hello')
-
-        self.assertListEqual(pr.parser_list('hello'), ['hello'])
-        self.assertListEqual(pr.parser_list(['hello', 'world']),
-                ['hello', 'world'])
-
-        for value in ['Yes', 'yes', 'true', 'True', True]:
-            self.assertTrue(pr.parser_bool(value))
-        for value in ['No', 'no', 'false', 'False', False]:
-            self.assertFalse(pr.parser_bool(value))
-
 
 
 if __name__ == '__main__':
