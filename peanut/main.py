@@ -6,7 +6,7 @@ import codecs
 
 import peanut.reader as reader
 from peanut.config import config
-from peanut.model import Tag, Category, Post
+from peanut.model import SinglePage, Tag, Category, Post
 from peanut.template import Template
 from peanut.context import filters
 from peanut.utils import neighborhood, url2pathname
@@ -34,11 +34,24 @@ def generate():
 
     template = Template(config.theme_path, filters=filters, **context)
 
-    #posts
+    # posts
     for prev, post, next in neighborhood(Post.all()):
         content = template.render(post.layout, post=post,
                 prev_post=prev, next_post=next)
         write_html(post.file_path, content)
+
+    # tags
+    for tag in Tag.all():
+        content = template.render(Tag.layout, tag=tag, posts=tag.posts)
+        write_html(tag.file_path, content)
+
+    for page in ('index', 'rss', 'sitemap'):
+        single = SinglePage(page, page)
+        single.layout = page
+
+        content = template.render(single.layout, posts=Post.all(),
+                tags=Tag.all())
+        write_html(single.file_path, content)
 
 
 def write_html(path, content):
@@ -81,6 +94,7 @@ def read_all_drafts(path):
         draft = reader.read(p)
         if draft:
             create_post(draft)
+
 
 
 def start(directory='.', config_path=None):

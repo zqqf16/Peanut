@@ -125,6 +125,7 @@ config = Config({
     'site': {
         'title': 'Peanut Demo',
         'logo': 'path_to_your_logo',
+        'cover': None,
         'url': 'http://peanut.zorro.im',
         'description': 'A simple static blog generator',
         'navigation': False,
@@ -143,6 +144,7 @@ config = Config({
         'tag': 'tags/{slug}.html',
         'category': 'category/{slug}.html',
         'page': 'page/{slug}.html',
+        'index': 'index.html',
         'sitemap': 'sitemap.xml',
         'rss': 'rss.xml',
         'asset': '/assets/',

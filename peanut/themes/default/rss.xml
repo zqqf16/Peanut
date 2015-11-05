@@ -9,7 +9,7 @@
 	{% for post in posts %}
     <item>
 		<title>{{ post.title }}</title>
-		<link>{{ post.url|abs_path }}</link>
+		<link>{{ post.url|abs_url }}</link>
 		<description>{{ post.content|e }}</description>
 		<author>{{ author.name }}</author>
 		<copyright></copyright>

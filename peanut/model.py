@@ -87,6 +87,11 @@ class BaseModel(with_metaclass(ObjectPool, object)):
         return template.format(**self.__dict__)
 
 
+class SinglePage(BaseModel):
+    '''Single page, such as index, rss and sitemap'''
+    pass
+
+
 class Post(BaseModel):
     '''Post'''
 
@@ -107,8 +112,7 @@ class Post(BaseModel):
         self._category = None
 
         if tags:
-            for tag in tags:
-                self.add_tag(tag)
+            self._tags.update(tags)
 
         if category:
             self.category = category
@@ -162,7 +166,7 @@ class Tag(BaseModel):
     @property
     def posts(self):
         """Get all posts that have this tag"""
-        return filter(lambda p: self.title in p._tags, Post.all())
+        return list(filter(lambda p: self.title in p._tags, Post.all()))
 
 
 class Category(Tag):
