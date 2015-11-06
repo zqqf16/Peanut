@@ -121,17 +121,26 @@ class TagWriter(ArchiveWriter):
             super(TagWriter, self).run(posts=posts)
 
 
-class RssWriter(ArchiveWriter):
+class RssWriter(Writer):
     """Rss writer
     """
-    def __init__(self, posts, template):
-        super(RssWriter, self).__init__(posts, template, 'rss',
-                configs.path.rss)
+    def __init__(self, posts, template, layout='rss'):
+        super(RssWriter, self).__init__(posts, template)
+        self.file_path = configs.path[layout]
+        self.layout = layout
+        self.num = 5
+
+    def run(self):
+        content = self.render()
+        self.write_to_file(self.file_path, content)
+
+    def render(self):
+        return self.template.render(self.layout, posts=self.posts[:self.num])
 
 
-class SitemapWriter(ArchiveWriter):
+class SitemapWriter(RssWriter):
     """Sitemap writer
     """
     def __init__(self, posts, template):
-        super(SitemapWriter, self).__init__(posts, template, 'sitemap',
-                configs.path.sitemap)
+        super(SitemapWriter, self).__init__(posts, template, 'sitemap')
+        self.num = len(self.posts)
