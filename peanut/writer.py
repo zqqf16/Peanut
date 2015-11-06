@@ -91,7 +91,7 @@ class ArchiveWriter(Writer):
             self.write_to_file(p.file_path, content)
 
     def render(self, page):
-        return self.template.render(self.layout, posts=page.posts,
+        return self.template.render(self.layout, posts=page.posts, page=page,
                 prev_page=page.prev, next_page=page.next, **self.context)
 
 

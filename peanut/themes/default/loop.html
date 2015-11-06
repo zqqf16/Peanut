@@ -1,10 +1,14 @@
 {# Previous/next page links - only displayed on page 2+ #}
 <div class="extra-pagination inner">
-    {% if pagination %}
+    {% if prev_page or next_page %}
     <nav class="pagination" role="navigation">
-        <span class="page-number">Page 1 of 2</span>
-            <a class="newer-posts" href="/page/2/">Older Posts →</a>
-            <a class="older-posts" href="/page/2/">Older Posts →</a>
+        <span class="page-number">Page {{page.page}} of {{page.total}}</span>
+            {% if prev_page %}
+            <a class="newer-posts" href="{{prev_page.url}}">← Newer Posts</a>
+            {% endif %}
+            {% if next_page %}
+            <a class="older-posts" href="{{next_page.url}}">Older Posts →</a>
+            {% endif %}
         </span>
     </nav>
     {% endif %}
@@ -40,12 +44,15 @@
     </footer>
 </article>
 {% endfor %}
-
-{% if pagination %}
+{% if prev_page or next_page %}
 <nav class="pagination" role="navigation">
-    <span class="page-number">Page 1 of 2</span>
-        <a class="newer-posts" href="/page/2/">Older Posts →</a>
-        <a class="older-posts" href="/page/2/">Older Posts →</a>
+    <span class="page-number">Page {{page.page}} of {{page.total}}</span>
+        {% if prev_page %}
+        <a class="newer-posts" href="{{prev_page.url}}">← Newer Posts</a>
+        {% endif %}
+        {% if next_page %}
+        <a class="older-posts" href="{{next_page.url}}">Older Posts →</a>
+        {% endif %}
     </span>
 </nav>
 {% endif %}
