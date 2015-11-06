@@ -8,11 +8,11 @@ from __future__ import unicode_literals
 
 import unittest
 from datetime import datetime
-from peanut.model import Post, Tag
+from peanut.model import Post, Tag, Pagination
 from peanut.options import configs, env
 
 
-class TestModel(unittest.TestCase):
+class TestPost(unittest.TestCase):
     def test_post(self):
         meta = {
             'date': None,
@@ -41,6 +41,10 @@ class TestModel(unittest.TestCase):
         self.assertEqual(post.file_path, 'posts/Hello-world.html')
         self.assertEqual(post.url, '/posts/Hello-world.html')
 
+        post2 = Post('1', '1', '')
+        post2.date = datetime.now()
+        self.assertTrue(post < post2)
+
     def test_relationships(self):
         tags=['test', 'relation']
         t1 = Tag(tags[0])
@@ -50,3 +54,43 @@ class TestModel(unittest.TestCase):
 
         self.assertIn(t1, p.tags)
         self.assertIn(t2, p.tags)
+
+class TestPagination(unittest.TestCase):
+    def test_pagination(self):
+        posts = []
+        for i in range(0, 10):
+            title = 'post_{}'.format(i)
+            posts.append(Post(title, title, title))
+
+        page = Pagination(posts, base_url='tags/test/', posts_per_page=2)
+
+        self.assertEqual(page.page, 1)
+        self.assertEqual(page.total, 5)
+        self.assertListEqual(page.posts, posts[0:2])
+        self.assertEqual(page.url, '/tags/test/page/1/')
+        self.assertEqual(page.file_path, 'tags/test/page/1/index.html')
+
+        self.assertIsNone(page.prev)
+
+        next = page.next
+        self.assertListEqual(next.posts, posts[2:4])
+
+        n = 0
+        for p in page.iterate():
+            self.assertEqual(p.page, n+1)
+            self.assertListEqual(p.posts, posts[n*2:n*2+2])
+            n += 1
+
+    def test_path(self):
+        posts = []
+        for i in range(0, 10):
+            title = 'post_{}'.format(i)
+            posts.append(Post(title, title, title))
+
+        page = Pagination(posts, base_url='/tags/test')
+        self.assertEqual(page.url, '/tags/test/page/1/')
+        self.assertEqual(page.file_path, '/tags/test/page/1/index.html')
+
+        page = Pagination(posts, base_url='/tags/test/index.html',).next
+        self.assertEqual(page.url, '/tags/test/page/2/index.html')
+        self.assertEqual(page.file_path, '/tags/test/page/2/index.html')

@@ -6,6 +6,8 @@
 
 from __future__ import unicode_literals
 
+import re
+import os
 from datetime import datetime
 
 from peanut.utils import path_to_url, url_safe
@@ -78,3 +80,85 @@ class Post(BaseModel):
 
     def __lt__(self, other):
         return self.date < other.date
+
+
+class Pagination(object):
+    """Pagination"""
+
+    def __init__(self, posts, page=1, base_url=None, posts_per_page = 5):
+        self._posts = posts
+        # page number starts from 1
+        self.page = page
+        self.base_url = base_url
+        if posts_per_page == 0:
+            posts_per_page = len(self._posts)
+        self.posts_per_page = posts_per_page
+
+        self.path = None
+        self.url = None
+        self.parse_path_and_url()
+
+    def parse_path_and_url(self):
+        template = configs.path.pagination
+        relative_path = template.format(
+            number=self.page,
+            num=self.page,
+            n=self.page
+        )
+
+        file_path = None
+        url = None
+
+        if re.search(r'index.html?$', self.base_url):
+            # If base_url ends with index.html/index.htm,
+            # insert page path before the index.*
+            parent, index = os.path.split(self.base_url)
+            url = file_path = os.path.join(parent, relative_path, index)
+        else:
+            if not self.base_url.endswith('/'):
+                self.base_url = self.base_url + '/'
+            else:
+                if not relative_path.endswith('/'):
+                    relative_path = relative_path + '/'
+
+            url = os.path.join(self.base_url, relative_path)
+            file_path = os.path.join(url, 'index.html')
+
+        if not url.startswith('/'):
+            url = '/' + url
+
+        self.file_path = url_safe(file_path)
+        self.url = url_safe(url)
+
+    @property
+    def posts(self):
+        start = (self.page - 1) * self.posts_per_page
+        end = start + self.posts_per_page
+        return self._posts[start:end]
+
+    @property
+    def total(self):
+        if self.posts_per_page == 0:
+            return 1
+        else:
+            return int((len(self._posts)-1)/self.posts_per_page) + 1
+
+    @property
+    def next(self):
+        if self.page == self.total:
+            return None
+        return Pagination(self._posts, self.page+1,
+                self.base_url, self.posts_per_page)
+
+    @property
+    def prev(self):
+        if self.page == 1:
+            return None
+        return Pagination(self._posts, self.page-1,
+                self.base_url, self.posts_per_page)
+
+    def iterate(self):
+        curr = self
+        for i in range(curr.page-1, self.total):
+            yield curr
+            curr = curr.next

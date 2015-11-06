@@ -151,5 +151,5 @@ def load_configs(path):
 # Global environments
 
 env = Option({
-    'posts': {},
+    'posts': [],
 })
