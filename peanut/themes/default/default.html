@@ -13,7 +13,22 @@
     {% block header %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %} nav-closed">
-    {{navigation}}
+    <div class="nav">
+        <h3 class="nav-title">Contact</h3>
+        <a href="#" class="nav-close">
+            <span class="hidden">Close</span>
+        </a>
+        <ul>
+            {% for name, url in author.socials.items() %}
+            <li class="nav-item" role="presentation">
+                <a href={{url}}>{{name}}</a>
+            </li>
+            {% endfor %}
+        </ul>
+        <a class="subscribe-button icon-feed" href="{{site.url}}/rss.xml">Subscribe</a>
+    </div>
+    <span class="nav-cover"></span>
+
     <div class="site-wrapper">
         {% block body %}{% endblock %}
         <footer class="site-footer clearfix">
