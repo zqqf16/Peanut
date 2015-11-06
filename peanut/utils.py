@@ -61,6 +61,7 @@ def neighborhood(alist):
         yield (prev, curr, next)
     yield (prev, curr, None)
 
+
 def list_dir(path):
     """List all unhidden files
     """

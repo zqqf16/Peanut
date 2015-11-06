@@ -81,7 +81,6 @@ configs = Option({
         'post': 'posts/{slug}.html',
         'tag': 'tags/{title}/',
         'pagination': 'page/{num}/',
-        'page': 'page/{slug}.html',
         'index': 'index.html',
         'sitemap': 'sitemap.xml',
         'rss': 'rss.xml',

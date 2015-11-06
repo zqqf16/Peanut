@@ -114,9 +114,8 @@ class Pagination(object):
 
         file_path = None
         url = None
-
         if re.search(r'index.html?$', self.base_url):
-            # If base_url ends with index.html/index.htm,
+            # If base_url ends with index.html or index.htm,
             # insert page path before the index.*
             parent, index = os.path.split(self.base_url)
             url = file_path = os.path.join(parent, relative_path, index)
@@ -124,14 +123,15 @@ class Pagination(object):
             if not self.base_url.endswith('/'):
                 self.base_url = self.base_url + '/'
             else:
-                if not relative_path.endswith('/'):
+                if relative_path != '' and not relative_path.endswith('/'):
                     relative_path = relative_path + '/'
-
             url = os.path.join(self.base_url, relative_path)
             file_path = os.path.join(url, 'index.html')
 
         if not url.startswith('/'):
             url = '/' + url
+        if file_path.startswith('/'):
+            file_path = file_path[1:]
 
         self.file_path = url_safe(file_path)
         self.url = url_safe(url)

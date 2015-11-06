@@ -12,15 +12,6 @@ from peanut.context import get_filters
 from peanut.model import Tag, Post, Pagination
 
 
-"""
-template = Template(
-    configs.theme_path,
-    filters=get_filters(configs),
-    site=configs.site,
-    author=configs.author
-)
-"""
-
 class Writer(object):
     """Base writer
     """
@@ -32,6 +23,8 @@ class Writer(object):
     def write_to_file(self, file_path, content):
         """Write content to file
         """
+
+        file_path = os.path.join(configs.pwd, file_path)
         dirname = os.path.split(file_path)[0]
         try:
             os.makedirs(dirname)
@@ -59,6 +52,7 @@ class PostWriter(Writer):
             self.write_to_file(post.file_path, content)
 
     def render(self, post):
+        prev, next = self._get_post_naighbor(post)
         return self.template.render(post.layout, post=post,
                 prev_post=prev, next_post=next)
 
@@ -80,11 +74,12 @@ class PostWriter(Writer):
 class ArchiveWriter(Writer):
     """Archive writer"""
 
-    def __init__(self, posts, layout=None, base_url=None):
-        super(ArchiveWriter, self).__init__(posts)
+    def __init__(self, posts, template, layout=None, base_url=None):
+        super(ArchiveWriter, self).__init__(posts, template)
         self.base_url = base_url or configs.path.index
         self.layout = layout or 'index'
         self.num_per_page = configs.pagination
+        self.context = {}
 
     def run(self, posts=None):
         posts = posts or self.posts
@@ -97,15 +92,16 @@ class ArchiveWriter(Writer):
 
     def render(self, page):
         return self.template.render(self.layout, posts=page.posts,
-                prev_page=page.prev, next_page=page.next)
+                prev_page=page.prev, next_page=page.next, **self.context)
 
 
 class TagWriter(ArchiveWriter):
     """Tag writer
     """
 
-    def __init__(self, posts):
-        super(TagWriter, self).__init__(posts, 'tag', config.path.tag)
+    def __init__(self, posts, template):
+        super(TagWriter, self).__init__(posts, template, 'tag',
+                configs.path.tag)
         self.tags = {}
 
         for p in posts:
@@ -120,19 +116,22 @@ class TagWriter(ArchiveWriter):
             posts = self.tags.get(tag)
             if not posts:
                 continue
+            self.context['tag'] = tag
+            self.base_url = tag.url
             super(TagWriter, self).run(posts=posts)
 
 
 class RssWriter(ArchiveWriter):
     """Rss writer
     """
-    def __init__(self, posts):
-        super(RssWriter, self).__init__(posts, 'rss', config.path.rss)
+    def __init__(self, posts, template):
+        super(RssWriter, self).__init__(posts, template, 'rss',
+                configs.path.rss)
 
 
 class SitemapWriter(ArchiveWriter):
     """Sitemap writer
     """
-    def __init__(self, posts):
-        super(SitemapWriter, self).__init__(posts, 'sitemap',
-                config.path.sitemap)
+    def __init__(self, posts, template):
+        super(SitemapWriter, self).__init__(posts, template, 'sitemap',
+                configs.path.sitemap)
