@@ -8,8 +8,8 @@ from __future__ import unicode_literals
 
 import unittest
 from datetime import datetime
-from peanut.model import Post
-from peanut.options import configs
+from peanut.model import Post, Tag
+from peanut.options import configs, env
 
 
 class TestModel(unittest.TestCase):
@@ -40,3 +40,20 @@ class TestModel(unittest.TestCase):
         configs.path.post = 'posts/{title}.html'
         self.assertEqual(post.file_path, 'posts/Hello-world.html')
         self.assertEqual(post.url, '/posts/Hello-world.html')
+
+    def test_relationships(self):
+        tags=['test', 'relation']
+        t1 = Tag(tags[0])
+        t2 = Tag(tags[1])
+        env.tags[t1.title] = t1
+        env.tags[t2.title] = t2
+
+        p = Post('Hello world', 'hello-world', 'content', meta={'tags': tags})
+
+        env.posts[p.title] = p
+
+        self.assertIn(t1, p.tags)
+        self.assertIn(t2, p.tags)
+
+        self.assertListEqual(t1.posts, [p])
+        self.assertListEqual(t2.posts, [p])

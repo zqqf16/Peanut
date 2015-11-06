@@ -61,6 +61,14 @@ def neighborhood(alist):
         yield (prev, curr, next)
     yield (prev, curr, None)
 
+def list_dir(path):
+    """List all unhidden files
+    """
+    for filename in os.listdir(path):
+        if filename.startswith('.'):
+            continue
+        yield os.path.join(path, filename)
+
 
 def walk_directory(path, abs_path=True):
     """Generate directory tree

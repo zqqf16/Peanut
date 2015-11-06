@@ -79,8 +79,8 @@ configs = Option({
     'path': {
         'draft': 'drafts',
         'post': 'posts/{slug}.html',
-        'tag': 'tags/{slug}.html',
-        'category': 'category/{slug}.html',
+        'tag': 'tags/{title}/',
+        'pagination': 'page/{num}/',
         'page': 'page/{slug}.html',
         'index': 'index.html',
         'sitemap': 'sitemap.xml',
