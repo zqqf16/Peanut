@@ -87,8 +87,8 @@ class TestPagination(unittest.TestCase):
 
         page = Pagination(posts, base_url='/tags/test')
         self.assertEqual(page.url, '/tags/test/')
-        self.assertEqual(page.file_path, '/tags/test/index.html')
+        self.assertEqual(page.file_path, 'tags/test/index.html')
 
         page = Pagination(posts, base_url='/tags/test/index.html',).next
         self.assertEqual(page.url, '/tags/test/page/2/index.html')
-        self.assertEqual(page.file_path, '/tags/test/page/2/index.html')
+        self.assertEqual(page.file_path, 'tags/test/page/2/index.html')

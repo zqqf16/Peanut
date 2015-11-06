@@ -64,7 +64,8 @@ class Site(object):
         draft = reader.read(draft_file)
         if not draft:
             return
-        if not draft.get('publish', True):
+
+        if not draft['meta'].get('publish', True):
             return
 
         title = draft.get('title', None)

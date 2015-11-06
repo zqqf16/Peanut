@@ -117,7 +117,7 @@ class TagWriter(ArchiveWriter):
             if not posts:
                 continue
             self.context['tag'] = tag
-            self.base_url = tag.url
+            self.base_url = tag.file_path
             super(TagWriter, self).run(posts=posts)
 
 
