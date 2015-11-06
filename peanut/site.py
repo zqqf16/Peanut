@@ -51,16 +51,12 @@ class Site(object):
 
         load_configs(config_path)
 
-
     def load_drafts(self):
         """Load all drafts
         """
         draft_dir = os.path.join(configs.pwd, configs.path.draft)
         for f in list_dir(draft_dir):
-            if f.startswith('.'):
-                continue
             self.parse_draft(f)
-
 
     def parse_draft(self, draft_file):
         """Parse draft file
@@ -85,6 +81,7 @@ class Site(object):
         """Generate static site
         """
         self.load_drafts()
+        self.posts.sort(reverse=True)
 
         writers = [
             writer.PostWriter,

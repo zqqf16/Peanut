@@ -1,5 +1,5 @@
 {% extends "default.html" %}
-{% block body_class %}home-template{% endblock %}
+{% block body_class %}{% if page.page != 1 %} archive-template {% else %} home-template {% endif %}{% endblock %}
 {% block body %}
 {# The big featured header #}
 <header class="main-header {%if site.cover %}" style="background-image: url({{ site.cover }}){% else %}no-cover{% endif %}">
