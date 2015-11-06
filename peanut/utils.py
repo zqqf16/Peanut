@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import re
 import six
 
 try:
@@ -20,6 +21,14 @@ def url_to_path(url):
     if six.PY2:
         url = url.encode('utf-8')
     return url2pathname(url)
+
+def url_safe(string):
+    new_str = re.sub(
+            r'[<>,~!#&\{\}\(\)\[\]\*\^\$\?]', ' ', string
+    )
+
+    return '-'.join(new_str.strip().split())
+
 
 def package_resource(path):
     """Get resource from package
