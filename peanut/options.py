@@ -90,6 +90,8 @@ configs = Option({
     'sitemap': True,
     'rss': True,
     'theme': 'default',
+    'theme_path': '',
+    'pagination': 5,
 })
 
 
@@ -120,7 +122,7 @@ def verify_theme(config):
         return
 
     # search in package
-    package_path = os.path.abspath(os.path.split(os.path.abspath(__file__))[0])
+    package_path = os.path.abspath(os.path.split(__file__)[0])
     theme_path = os.path.join(package_path, 'themes', theme)
     if not os.path.isdir(theme_path):
         raise ValidationError('Theme named {} not found'.format(theme))

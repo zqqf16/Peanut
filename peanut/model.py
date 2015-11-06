@@ -46,6 +46,9 @@ class Tag(BaseModel):
     def __eq__(self, other):
         return self.title == other.title
 
+    def __hash__(self):
+        return hash(self.title)
+
 
 class Post(BaseModel):
     """Post model
@@ -105,6 +108,9 @@ class Pagination(object):
             num=self.page,
             n=self.page
         )
+
+        if self.page == 1:
+            relative_path = ''
 
         file_path = None
         url = None
