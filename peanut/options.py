@@ -152,5 +152,4 @@ def load_configs(path):
 
 env = Option({
     'posts': {},
-    'tags': {},
 })

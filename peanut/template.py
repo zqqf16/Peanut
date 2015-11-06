@@ -42,8 +42,9 @@ class Template(object):
         # Update filters
         if isinstance(filters, dict):
             self.env.filters.update(filters)
+
         # Update global namesapce
-            self.env.globals.update(kwargs)
+        self.env.globals.update(kwargs)
 
     def update_context(self, **kwargs):
         """Update global context
@@ -51,7 +52,7 @@ class Template(object):
         self.env.globals.update(kwargs)
 
     def render(self, name, **context):
-        """Render template with name and context"""
-
+        """Render template with name and context
+        """
         template = self.env.get_template(name)
         return template.render(**context)

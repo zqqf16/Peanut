@@ -45,15 +45,8 @@ class TestModel(unittest.TestCase):
         tags=['test', 'relation']
         t1 = Tag(tags[0])
         t2 = Tag(tags[1])
-        env.tags[t1.title] = t1
-        env.tags[t2.title] = t2
 
         p = Post('Hello world', 'hello-world', 'content', meta={'tags': tags})
 
-        env.posts[p.title] = p
-
         self.assertIn(t1, p.tags)
         self.assertIn(t2, p.tags)
-
-        self.assertListEqual(t1.posts, [p])
-        self.assertListEqual(t2.posts, [p])

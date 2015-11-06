@@ -41,9 +41,8 @@ class Tag(BaseModel):
         self.title = title
         self.slug = url_safe(title)
 
-    @property
-    def posts(self):
-        return [p for k, p in env.posts.items() if self.title in p.tag_titles]
+    def __eq__(self, other):
+        return self.title == other.title
 
 
 class Post(BaseModel):
@@ -68,7 +67,7 @@ class Post(BaseModel):
 
     @property
     def tags(self):
-        return [v for k, v in env.tags.items() if k in self.tag_titles]
+        return [Tag(t) for t in self.tag_titles]
 
     def __getattr__(self, key):
         try:
@@ -76,3 +75,6 @@ class Post(BaseModel):
         except:
             pass
         return self.meta.get(key)
+
+    def __lt__(self, other):
+        return self.date < other.date
