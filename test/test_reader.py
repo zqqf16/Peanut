@@ -40,16 +40,16 @@ others:
     def test_parser(self):
         reader = pr.MarkdownReader()
         draft = reader.read('/var/tmp/test_markdown.md')
-        self.assertEqual(draft['publish'], True)
-        self.assertEqual(draft['top'], False)
+        self.assertEqual(draft['meta']['publish'], True)
+        self.assertEqual(draft['meta']['top'], False)
         self.assertEqual(draft['title'], 'Hello world')
         self.assertEqual(draft['content'], '<p>我能吞下玻璃却不伤身体</p>')
-        self.assertIn('test', draft['tags'])
-        self.assertIn('life', draft['tags'])
-        self.assertEqual(draft['cover'], 'path/to/cover')
-        self.assertDictEqual(draft['others'], {'showTitle': True})
+        self.assertIn('test', draft['meta']['tags'])
+        self.assertIn('life', draft['meta']['tags'])
+        self.assertEqual(draft['meta']['cover'], 'path/to/cover')
+        self.assertDictEqual(draft['meta']['others'], {'showTitle': True})
         self.assertIn('test_markdown', draft['slug'])
-        self.assertIsInstance(draft['date'], datetime)
+        self.assertIsInstance(draft['meta']['date'], datetime)
 
     def test_get_reader(self):
         reader = None

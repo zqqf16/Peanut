@@ -6,180 +6,165 @@
 
 from __future__ import unicode_literals
 
-import inspect
-
-from six import with_metaclass
+import re
+import os
 from datetime import datetime
 
-from peanut.utils import path_to_url
+from peanut.utils import path_to_url, url_safe
+from peanut.options import configs, env
 
 
-class ObjectPool(type):
-    """Meta class to implement a simple "object pool".
+class BaseModel(object):
+    """Base model class
     """
 
-    def __new__(mcs, name, bases, attrs):
-        """Add an attribute "_pool".
-        """
-        attrs['_pool'] = {}
-        return super(ObjectPool, mcs).__new__(mcs, name, bases, attrs)
-
-
-class BaseModel(with_metaclass(ObjectPool, object)):
-    """Base model"""
-
-    # Pool identity key
-    _identity = 'slug'
-
-    # layout
-    layout = 'page'
-
-    # file path template
-    path_template = u'{slug}.html'
-
-    @classmethod
-    def all(cls):
-        """Get all instance from pool"""
-        return cls._pool.values()
-
-    @classmethod
-    def get(cls, identity):
-        """Get an instance from pool by identity"""
-        return cls._pool.get(identity)
-
-    @classmethod
-    def create(cls, *args, **kwargs):
-        """Create an instance"""
-        instance = cls(*args, **kwargs)
-        cls._pool[instance.identity] = instance
-        return instance
-
-    @classmethod
-    def get_or_create(cls, *args, **kwargs):
-        """Get an instance from pool, if does not exist, create a new one"""
-        id_key = getattr(cls, '_identity', None)
-        call_args = inspect.getcallargs(cls.__init__, None, *args, **kwargs)
-        identity = call_args.get(id_key)
-        instance = cls.get(identity, None)
-        return instance or cls.create(*args, **kwargs)
-
-    @classmethod
-    def add(cls, instance):
-        cls._pool[instance.identity] = instance
-
-    @property
-    def identity(self):
-        return self.__dict__[self._identity]
-
-    def __init__(self, title, slug):
-        self.title = title
-        self.slug = slug.replace(' ', '_')
-
-    @property
-    def url(self):
-        path = self.file_path
-        if not path.startswith('/'):
-            path = '/' + path
-        return path_to_url(path)
+    layout = None
 
     @property
     def file_path(self):
-        try:
-            return self.path_template.format(**self.__dict__)
-        except:
-            print(self.title)
-            print(self.__dict__)
-            exit()
-
-
-class SinglePage(BaseModel):
-    '''Single page, such as index, rss and sitemap'''
-    pass
-
-
-class Post(BaseModel):
-    '''Post'''
-
-    layout = 'post'
-
-    def __init__(self, title, slug, content=None, date=None,
-                 publish=True, top=False, layout='post',
-                 tags=None, category=None, **kwargs):
-
-        super(Post, self).__init__(title=title, slug=slug)
-
-        self.content = content
-        self.date = date or datetime.now()
-        self.top = top
-        self.publish = publish
-        self.layout = layout
-        self._tags = set()
-        self._category = None
-
-        if tags:
-            self._tags.update(tags)
-
-        if category:
-            self.category = category
-
-    def __lt__(self, value):
-        return self.date < value.date
-
-    def add_tag(self, tag):
-        """Add tag"""
-        self._tags.add(tag.title)
-
-    @classmethod
-    def all(cls, post_filter=None):
-        """Get all posts
-        @param post_filter: a callable filter
-        @return: post list
-        """
-        posts = list(filter(post_filter, super(Post, cls).all()))
-        return sorted(posts, reverse=True)
-
-    @classmethod
-    def top_posts(cls):
-        """Get all top posts"""
-        return cls.all(lambda p: p.top)
+        template = configs.path[self.__class__.layout]
+        return url_safe(template.format(**self.__dict__))
 
     @property
-    def tags(self):
-        """Get all tags"""
-        return [Tag.get(tag) for tag in self._tags]
-
-    @property
-    def catetory(self):
-        return Category.get(self._category)
-
-    @catetory.setter
-    def category(self, value):
-        if value:
-            self._category = value.title
-        else:
-            self._category = None
+    def url(self):
+        relative_url = path_to_url(self.file_path)
+        if not relative_url.startswith('/'):
+            relative_url = '/'+relative_url
+        return relative_url
 
 
 class Tag(BaseModel):
-    """Tag"""
+    """Tag model
+    """
 
     layout = 'tag'
 
     def __init__(self, title):
-        super(Tag, self).__init__(title=title, slug=title)
+        self.title = title
+        self.slug = url_safe(title)
+
+    def __eq__(self, other):
+        return self.title == other.title
+
+    def __hash__(self):
+        return hash(self.title)
+
+
+class Post(BaseModel):
+    """Post model
+    """
+
+    layout = 'post'
+
+    def __init__(self, title, slug, content=None, meta=None):
+        self.title = title
+        self.slug = url_safe(slug)
+        self.content = content
+
+        meta = meta or {}
+        self.date = meta.pop('date', None) or datetime.now()
+        self.publish = meta.pop('publish', True)
+        self.layout = meta.pop('layout', Post.layout)
+        self.top = meta.pop('top', False)
+        self.tag_titles = meta.pop('tags', [])
+
+        self.meta = meta
+
+    @property
+    def tags(self):
+        return [Tag(t) for t in self.tag_titles]
+
+    def __getattr__(self, key):
+        try:
+            return super(Post, self).__getattr__(key)
+        except:
+            pass
+        return self.meta.get(key)
+
+    def __lt__(self, other):
+        return self.date < other.date
+
+
+class Pagination(object):
+    """Pagination"""
+
+    def __init__(self, posts, page=1, base_url=None, posts_per_page = 5):
+        self._posts = posts
+        # page number starts from 1
+        self.page = page
+        self.base_url = base_url
+        if posts_per_page == 0:
+            posts_per_page = len(self._posts)
+        self.posts_per_page = posts_per_page
+
+        self.path = None
+        self.url = None
+        self.parse_path_and_url()
+
+    def parse_path_and_url(self):
+        template = configs.path.pagination
+        relative_path = template.format(
+            number=self.page,
+            num=self.page,
+            n=self.page
+        )
+
+        if self.page == 1:
+            relative_path = ''
+
+        file_path = None
+        url = None
+        if re.search(r'index.html?$', self.base_url):
+            # If base_url ends with index.html or index.htm,
+            # insert page path before the index.*
+            parent, index = os.path.split(self.base_url)
+            url = file_path = os.path.join(parent, relative_path, index)
+        else:
+            if not self.base_url.endswith('/'):
+                self.base_url = self.base_url + '/'
+            else:
+                if relative_path != '' and not relative_path.endswith('/'):
+                    relative_path = relative_path + '/'
+            url = os.path.join(self.base_url, relative_path)
+            file_path = os.path.join(url, 'index.html')
+
+        if not url.startswith('/'):
+            url = '/' + url
+        if file_path.startswith('/'):
+            file_path = file_path[1:]
+
+        self.file_path = url_safe(file_path)
+        self.url = url_safe(url)
 
     @property
     def posts(self):
-        """Get all posts that have this tag"""
-        return list(filter(lambda p: self.title in p._tags, Post.all()))
-
-
-class Category(Tag):
-    """Category"""
-
-    layout = 'category'
+        start = (self.page - 1) * self.posts_per_page
+        end = start + self.posts_per_page
+        return self._posts[start:end]
 
     @property
-    def posts(self):
-        """Get all posts that belongs to this category"""
-        return filter(lambda p: p._category==self.title, Post.all())
+    def total(self):
+        if self.posts_per_page == 0:
+            return 1
+        else:
+            return int((len(self._posts)-1)/self.posts_per_page) + 1
+
+    @property
+    def next(self):
+        if self.page == self.total:
+            return None
+        return Pagination(self._posts, self.page+1,
+                self.base_url, self.posts_per_page)
+
+    @property
+    def prev(self):
+        if self.page == 1:
+            return None
+        return Pagination(self._posts, self.page-1,
+                self.base_url, self.posts_per_page)
+
+    def iterate(self):
+        curr = self
+        for i in range(curr.page-1, self.total):
+            yield curr
+            curr = curr.next

@@ -13,7 +13,7 @@ def read(fname):
 
 setup(
     name='peanut',
-    version='1.0c1',
+    version='1.0c2',
     license='MIT',
     url = "https://github.com/zqqf16/peanut",
     description='A static blog generator',

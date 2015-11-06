@@ -4,16 +4,16 @@
 """Config unittest
 """
 
-from __future__ import unicode_literals
-
 import os
 import unittest
-from peanut.config import default_config
 
+from peanut.options import configs, load_configs
+
+PWD = os.path.abspath(os.path.dirname(__file__))
 
 class TestConfig(unittest.TestCase):
     def test_load(self):
-        config = default_config()
-        config.load('config.yml')
-        self.assertEqual(config.site['title'], "Peanut Demo")
-        self.assertEqual(config.path['draft'], 'drafts')
+        configs.pwd = os.path.join(PWD, 'test_site')
+        load_configs('config.yml')
+        self.assertEqual(configs.site['title'], "Peanut Demo")
+        self.assertEqual(configs.path['draft'], 'drafts')

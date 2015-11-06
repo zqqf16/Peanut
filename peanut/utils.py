@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import re
 import six
 
 try:
@@ -20,6 +21,14 @@ def url_to_path(url):
     if six.PY2:
         url = url.encode('utf-8')
     return url2pathname(url)
+
+def url_safe(string):
+    new_str = re.sub(
+            r'[<>,~!#&\{\}\(\)\[\]\*\^\$\?]', ' ', string
+    )
+
+    return '-'.join(new_str.strip().split())
+
 
 def package_resource(path):
     """Get resource from package
@@ -51,6 +60,15 @@ def neighborhood(alist):
             next = alist[i+1]
         yield (prev, curr, next)
     yield (prev, curr, None)
+
+
+def list_dir(path):
+    """List all unhidden files
+    """
+    for filename in os.listdir(path):
+        if filename.startswith('.'):
+            continue
+        yield os.path.join(path, filename)
 
 
 def walk_directory(path, abs_path=True):
