@@ -31,7 +31,6 @@ setup(
             'themes/default/*.xml',
             'themes/default/assets/css/*.css',
             'themes/default/assets/js/*.js',
-            'themes/default/assets/fonts/*',
         ],
     },
 
