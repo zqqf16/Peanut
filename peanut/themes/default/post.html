@@ -61,6 +61,9 @@
                 </a>
             </section>
         </footer>
+        {% if site.get('disqus') %}
+            {% include 'disqus.html' %}
+        {% endif %}
     </article>
 </main>
 <aside class="read-next">

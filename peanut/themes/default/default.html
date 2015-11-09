@@ -40,5 +40,8 @@
     <script type="text/javascript" src="{{ 'js/jquery-1.11.3.min.js'|asset }}"></script>
     <script type="text/javascript" src="{{ 'js/jquery.fitvids.js'|asset }}"></script>
     <script type="text/javascript" src="{{ 'js/index.js'|asset }}"></script>
+    {% if site.get('google_analytics') %}
+        {% include 'google_analytics.html' %}
+    {% endif %}
 </body>
 </html>
