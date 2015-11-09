@@ -71,7 +71,7 @@
     <a class="read-next-story {% if next_post.image %}" style="background-image: url({{ next_post.image }}){% else %}no-cover{% endif %}" href="{{ next_post.url }}">
         <section class="post">
             <h2>{{ next_post.title }}</h2>
-            <p>{{ next_post.excerpt }}&hellip;</p>
+			<p>{% if next_post.excerpt %}{{ next_post.excerpt }}{% endif %}&hellip;</p>
         </section>
     </a>
     {% endif %}
@@ -79,7 +79,7 @@
     <a class="read-next-story prev {% if prev_post.image %}" style="background-image: url({{ prev_post.image }}){% else %}no-cover{% endif %}" href="{{ prev_post.url }}">
         <section class="post">
             <h2>{{ prev_post.title }}</h2>
-            <p>{{ prev_post.excerpt }}&hellip;</p>
+			<p>{% if prev_post.excerpt %}{{ prev_post.excerpt }}{% endif %}&hellip;</p>
         </section>
     </a>
     {% endif %}
