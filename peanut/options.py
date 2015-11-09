@@ -65,19 +65,19 @@ class Option(dict):
 configs = Option({
     'pwd': os.getcwd(),
     'site': {
-        'title': 'Peanut Demo',
-        'logo': 'path_to_your_logo',
+        'title': 'Peanut',
+        'logo': None,
         'cover': None,
         'url': 'http://peanut.zorro.im',
-        'description': 'A simple static blog generator',
+        'description': 'Another peanut blog',
         'navigation': False,
     },
     'author': {
-        'image': 'https://avatars2.githubusercontent.com/u/655326?v=3&s=40',
-        'name': 'zqqf16',
-        'url': 'http://blog.zorro.im/posts/about.html',
-        'bio': 'Pythoner',
-        'location': 'Beijing',
+        'image': None,
+        'name': 'Your Name',
+        'url': '/posts/about.html',
+        'bio': None,
+        'location': 'Beijing, China',
     },
     'path': {
         'draft': 'drafts',
@@ -93,7 +93,7 @@ configs = Option({
     'rss': True,
     'theme': 'default',
     'theme_path': '',
-    'pagination': 5,
+    'pagination': 10,
 })
 
 

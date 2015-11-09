@@ -27,6 +27,7 @@ setup(
     include_package_data = True,
     package_data={
         'peanut': [
+            'config.yml',
             'themes/default/*.html',
             'themes/default/*.xml',
             'themes/default/assets/css/*.css',
