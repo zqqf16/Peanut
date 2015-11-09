@@ -26,7 +26,10 @@ class Option(dict):
         return super(Option, self).__setitem__(key, value)
 
     def __getitem__(self, name):
-        return super(Option, self).__getitem__(name)
+        try:
+            return super(Option, self).__getitem__(name)
+        except KeyError:
+            return None
 
     def __delitem__(self, name):
         return super(Option, self).__delitem__(name)

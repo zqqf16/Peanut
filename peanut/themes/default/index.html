@@ -9,14 +9,39 @@
             <img src="{{ site.logo }}" alt="{{ site.title }}" />
         </a>
         {% endif %}
-        <a class="menu-button icon-menu" href="#">
+        {#<a class="menu-button icon-menu" href="#">
             <span class="word">Contact</span>
-        </a>
+        </a>#}
     </nav>
     <div class="vertical">
         <div class="main-header-content inner">
             <h1 class="page-title">{{ site.title }}</h1>
             <h2 class="page-description">{{ site.description }}</h2>
+            {% if site.links %}
+            <ul class="page-link">
+                {% for link in site.links %}
+                <li class="link-item">
+                    <a href="{{link.url}}" title="{{link.title}}">{{link.title}}</a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% if author.socials %}
+            <ul class="page-social">
+                {% for social in author.socials %}
+                <li class="social-item">
+                    <a href={{social.url}}>
+                        {% if social.icon %}
+                        <i class="fa fa-{{social.icon}}"></i>
+                        <span class="label">{{social.name}}</span>
+                        {% else %}
+                        {{social.name}}
+                        {% endif %}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
         </div>
     </div>
     <a class="scroll-down icon-arrow-left" href="#content" data-offset="-45"><span class="hidden">Scroll Down</span></a>

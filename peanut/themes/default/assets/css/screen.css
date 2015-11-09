@@ -468,6 +468,68 @@ margin on the iframe, cause it breaks stuff. */
     margin: 0 auto;
 }
 
+.page-link {
+    padding-left: 0;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    list-style: none
+}
+
+.page-link > li {
+    display: inline-block;
+    margin: 0 1px;
+}
+
+.page-link > li > a {
+    font-size: .9em;
+    -webkit-font-smoothing: antialiased;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-shadow: none;
+    position: relative;
+    float: none;
+    padding: .2rem .5rem;
+    display: block;
+    opacity: .8;
+    color: #f8f8f8
+}
+
+.page-link > li > a:hover {
+    opacity: 1;
+}
+
+.page-link {
+    display: block;
+}
+
+.page-social {
+    padding-left: 0;
+}
+.page-social .social-item {
+    display: inline-block;
+    line-height: 1em
+}
+
+.page-social .social-item a {
+    display: block;
+    padding: 6px 8px 6px 9px;
+    opacity: .8;
+    color: #f8f8f8
+}
+
+.page-social .social-item a:hover {
+    opacity: 1;
+}
+
+.page-social .social-item a .label {
+    display: none;
+}
+
+.page-social .social-item a .icon {
+    display: block;
+    font-size: 1.7em
+}
+
 /* Centres vertically yo. (IE8+) */
 .vertical {
     display: table-cell;
@@ -895,6 +957,10 @@ body.nav-opened .nav {
 }
 
 .no-cover .page-description {
+    color: rgba(0,0,0,0.5);
+}
+
+.no-cover .page-social a, .no-cover .page-link a {
     color: rgba(0,0,0,0.5);
 }
 
