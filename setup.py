@@ -7,13 +7,15 @@ from __future__ import print_function
 import os
 from setuptools import setup
 
+import peanut
+
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 setup(
     name='peanut',
-    version='1.0c2',
+    version=peanut.version,
     license='MIT',
     url = "https://github.com/zqqf16/peanut",
     description='A static blog generator',
@@ -27,6 +29,7 @@ setup(
     include_package_data = True,
     package_data={
         'peanut': [
+            'config.yml',
             'themes/default/*.html',
             'themes/default/*.xml',
             'themes/default/assets/css/*.css',
@@ -58,7 +61,7 @@ setup(
         'Programming Language :: Python :: 3.4',
     ],
 
-    install_requires=['Jinja2', 'Markdown', 'Pygments', 'PyYAML', 'six'],
+    install_requires=['Jinja2', 'Markdown', 'Pygments', 'PyYAML', 'six', 'docopt'],
 
     py_modules=['peanut'],
 

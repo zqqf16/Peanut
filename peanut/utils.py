@@ -70,28 +70,6 @@ def list_dir(path):
             continue
         yield os.path.join(path, filename)
 
-
-def walk_directory(path, abs_path=True):
-    """Generate directory tree
-
-    @param path: the directory to be walked
-    @param abs_path: return absolute file path or not
-
-    @return: dictionary, doesn't include the files start with '.'
-    """
-
-    tree = {'dirs':{}, 'files':[]}
-
-    for f in os.listdir(path):
-        if f.startswith('.'):
-            continue
-
-        p = os.path.join(path, f)
-        if os.path.isdir(p):
-            d = walk_directory(os.path.join(p))
-            tree['dirs'][p] = d
-
-        if os.path.isfile(p):
-            tree['files'].append(p)
-
-    return tree
+def get_resource(relative_path):
+    package_path = os.path.abspath(os.path.split(__file__)[0])
+    return os.path.join(package_path, relative_path)

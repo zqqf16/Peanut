@@ -3,6 +3,7 @@
 
 import os
 import six
+import shutil
 
 import peanut
 import peanut.reader as reader
@@ -12,7 +13,12 @@ from peanut.model import Post
 from peanut.options import configs, env, load_configs
 from peanut.template import Template
 from peanut.context import get_filters
-from peanut.utils import list_dir
+from peanut.utils import list_dir, get_resource
+
+try:
+    FileNotFoundError
+except:
+    FileNotFoundError = IOError
 
 
 class Site(object):
@@ -30,6 +36,18 @@ class Site(object):
                 filters=get_filters(configs),
                 site=configs.site,
                 author=configs.author)
+
+    @staticmethod
+    def init(directory='./'):
+        """Init peanut environments
+        """
+        # copy default config
+        shutil.copy(get_resource('config.yml'), directory)
+
+        # copy default theme assets
+        assets_path = os.path.join(directory, 'assets/')
+        shutil.copytree(get_resource('themes/default/assets'), assets_path)
+
 
     def load_config(self, config_path):
         """Load config file from file

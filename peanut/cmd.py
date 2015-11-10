@@ -1,33 +1,46 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import argparse
-import logging
+"""Peanut
 
+Usage:
+  peanut init [-v] [<directory>]
+  peanut [-v] [-c | --config <config_file_path>] [<directory>]
+  peanut (-h | --help)
+  peanut --version
+
+Options:
+  -c --config   Config file path.
+  -v            Visiable.
+  -h --help     Show help.
+  --version     Show version.
+"""
+
+import logging
+from docopt import docopt
+
+import peanut
 from peanut import site
 
-
-def cli():
-    """Command line interface
-    """
-    parser = argparse.ArgumentParser(description='Static blog generator')
-
-    parser.add_argument('dir', nargs='?', help='Blog directory')
-    parser.add_argument('-c', '--config', help='Config file path')
-
-    args = parser.parse_args()
-
-    return {
-        'directory': args.dir or '.',
-        'config_path': args.config or None
-    }
 
 def main():
     """Read command line arguments and generate site
     """
-    args = cli()
-    blog = site.Site(args['directory'], args['config_path'])
+    args = docopt(__doc__, version='Peanut '+peanut.version)
+
+    directory = args.get('<directory>', './') or './'
+    config_path = args.get('<config_file_path>', None)
+
+    if args['init']:
+        logging.info('Init ...')
+        site.Site.init()
+        logging.info('Done')
+        exit(0)
+
+    logging.info('Generating ...')
+    blog = site.Site(directory, config_path)
     blog.generate()
+    logging.info('Done')
 
 if __name__ == '__main__':
     main()
