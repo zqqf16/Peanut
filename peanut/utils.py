@@ -12,6 +12,28 @@ except:
     from urlparse import urljoin
     from urllib import pathname2url, url2pathname
 
+def to_s(value):
+    if isinstance(value, unicode):
+        return value.encode('utf-8')
+    if isinstance(value, str):
+        return value
+    if isinstance(value, basestring):
+        return str(value)
+    if isinstance(value, bytes):
+        return str(value)
+    return value
+
+def to_u(value):
+    if isinstance(value, unicode):
+        return value
+    if isinstance(value, basestring):
+        return value.decode('utf-8')
+    if isinstance(value, int):
+        return str(value)
+    if isinstance(value, bytes):
+        return value.decode('utf-8')
+    return value
+
 def path_to_url(path):
     if six.PY2:
         path = path.encode('utf-8')
@@ -68,30 +90,10 @@ def list_dir(path):
     for filename in os.listdir(path):
         if filename.startswith('.'):
             continue
-        yield os.path.join(path, filename)
-
-
-def walk_directory(path, abs_path=True):
-    """Generate directory tree
-
-    @param path: the directory to be walked
-    @param abs_path: return absolute file path or not
-
-    @return: dictionary, doesn't include the files start with '.'
-    """
-
-    tree = {'dirs':{}, 'files':[]}
-
-    for f in os.listdir(path):
-        if f.startswith('.'):
+        if os.path.isdir(filename):
             continue
+        yield to_u(os.path.join(path, filename))
 
-        p = os.path.join(path, f)
-        if os.path.isdir(p):
-            d = walk_directory(os.path.join(p))
-            tree['dirs'][p] = d
-
-        if os.path.isfile(p):
-            tree['files'].append(p)
-
-    return tree
+def get_resource(relative_path):
+    package_path = os.path.abspath(os.path.split(__file__)[0])
+    return os.path.join(package_path, relative_path)
