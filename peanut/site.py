@@ -62,6 +62,18 @@ class Site(object):
         logging.info('Asset directory created at %s',
                 assets_path, prefix='   ↳  ')
 
+        # mkdir
+        draft_path = os.path.join(directory, 'drafts/')
+        if os.path.isdir(draft_path):
+            logging.info('Draft directory already exists', prefix='   ↳  ')
+            return
+        try:
+            os.makedirs(draft_path)
+        except OSError:
+            logging.error('Create draft directory failed')
+        logging.info('Draft directory created at %s', draft_path,
+                prefix='   ↳  ')
+
 
     def load_config(self, config_path):
         """Load config file from file
