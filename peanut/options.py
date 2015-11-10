@@ -6,11 +6,19 @@ from __future__ import unicode_literals
 import os
 import codecs
 import yaml
+import logging
+
 import peanut
 
 
 class ValidationError(Exception):
-    """Optionurations validation exception"""
+    """Configs validation exception"""
+    def __init__(self, msg=None):
+        super(ValidationError, self).__init__(msg)
+        self.msg = msg
+
+class LoadingError(ValidationError):
+    """Loading exception"""
     pass
 
 
@@ -26,7 +34,10 @@ class Option(dict):
         return super(Option, self).__setitem__(key, value)
 
     def __getitem__(self, name):
-        return super(Option, self).__getitem__(name)
+        try:
+            return super(Option, self).__getitem__(name)
+        except KeyError:
+            return None
 
     def __delitem__(self, name):
         return super(Option, self).__delitem__(name)
@@ -62,19 +73,19 @@ class Option(dict):
 configs = Option({
     'pwd': os.getcwd(),
     'site': {
-        'title': 'Peanut Demo',
-        'logo': 'path_to_your_logo',
+        'title': 'Peanut',
+        'logo': None,
         'cover': None,
         'url': 'http://peanut.zorro.im',
-        'description': 'A simple static blog generator',
+        'description': 'Another peanut blog',
         'navigation': False,
     },
     'author': {
-        'image': 'https://avatars2.githubusercontent.com/u/655326?v=3&s=40',
-        'name': 'zqqf16',
-        'url': 'http://blog.zorro.im/posts/about.html',
-        'bio': 'Pythoner',
-        'location': 'Beijing',
+        'image': None,
+        'name': 'Your Name',
+        'url': '/posts/about.html',
+        'bio': None,
+        'location': 'Beijing, China',
     },
     'path': {
         'draft': 'drafts',
@@ -90,26 +101,26 @@ configs = Option({
     'rss': True,
     'theme': 'default',
     'theme_path': '',
-    'pagination': 5,
+    'pagination': 10,
 })
 
 
-def verify_path(config):
+def verify_path():
     """Verify path configurations"""
 
-    draft = os.path.join(config.pwd, config.path.draft)
+    draft = os.path.join(configs.pwd, configs.path.draft)
     if not os.path.isdir(draft):
         raise ValidationError('Draft path {} not found'.format(draft))
 
-def verify_theme(config):
+def verify_theme():
     """Verify theme configurations"""
 
-    theme = config.theme
+    theme = configs.theme
     post = 'post.html'
     index = 'index.html'
 
     # search in current dir
-    local_path = os.path.join(config.pwd, theme)
+    local_path = os.path.join(configs.pwd, theme)
     if os.path.isdir(local_path):
         for template in (post, index):
             if not os.path.isfile(os.path.join(local_path, template)):
@@ -117,7 +128,7 @@ def verify_theme(config):
                         'theme {}'.format(template, theme))
 
         # save theme path
-        config.theme_path = local_path
+        configs.theme_path = local_path
         return
 
     # search in package
@@ -127,11 +138,11 @@ def verify_theme(config):
         raise ValidationError('Theme named {} not found'.format(theme))
 
     # update theme_path
-    config.theme_path = theme_path
+    configs.theme_path = theme_path
 
-def verify_configs(config):
+def verify_configs():
     for verify_func in (verify_path, verify_theme):
-        verify_func(config)
+        verify_func()
 
 def load_yaml(path):
     """Load YAML format config file
@@ -145,9 +156,13 @@ def load_configs(path):
     file_type = os.path.splitext(path)[1]
     abs_path = os.path.join(configs.pwd, path)
     if file_type.lower() in ('.yml', '.yaml'):
-        configs.update(load_yaml(abs_path))
-
-    verify_configs(configs)
+        config_yaml = load_yaml(abs_path)
+        if config_yaml:
+            configs.update(config_yaml)
+        else:
+            logging.debug('Config file is empty')
+    else:
+        raise LoadingError('Unsupported config file type {}'.format(file_type))
 
 # Global environments
 

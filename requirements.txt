@@ -1,4 +1,6 @@
+Jinja2
 Markdown
 Pygments
 PyYAML
+docopt
 six

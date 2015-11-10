@@ -38,6 +38,8 @@ class Template(object):
         loader = SmartLoader(path)
         self.env = jinja2.Environment(
             loader=loader,
+            lstrip_blocks=True,
+            trim_blocks=True,
         )
         # Update filters
         if isinstance(filters, dict):

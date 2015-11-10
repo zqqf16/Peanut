@@ -3,8 +3,12 @@
 
 """Writer"""
 
+from __future__ import unicode_literals
+
+
 import os
 import six
+import logging
 
 from peanut.options import configs, env
 from peanut.template import Template
@@ -27,6 +31,7 @@ class Writer(object):
         file_path = os.path.join(configs.pwd, file_path)
         dirname = os.path.split(file_path)[0]
         try:
+            logging.debug('Try to make directory %s', dirname, prefix='   ↳  ')
             os.makedirs(dirname)
         except OSError:
             pass
@@ -48,7 +53,9 @@ class PostWriter(Writer):
 
     def run(self):
         for post in self.posts:
+            logging.debug('Render post %s', post.title)
             content = self.render(post)
+            logging.debug('Write to %s', post.file_path, prefix='   ↳  ')
             self.write_to_file(post.file_path, content)
 
     def render(self, post):
@@ -88,6 +95,7 @@ class ArchiveWriter(Writer):
 
         for n, p in enumerate(page.iterate()):
             content = self.render(p)
+            logging.debug('Write file %s', p.file_path, prefix='   ↳  ')
             self.write_to_file(p.file_path, content)
 
     def render(self, page):
@@ -113,6 +121,7 @@ class TagWriter(ArchiveWriter):
 
     def run(self):
         for tag in self.tags:
+            logging.debug('Render tag %s', tag.title)
             posts = self.tags.get(tag)
             if not posts:
                 continue
@@ -131,7 +140,9 @@ class RssWriter(Writer):
         self.num = 5
 
     def run(self):
+        logging.debug('Render %s', self.file_path)
         content = self.render()
+        logging.debug('Write file %s', self.file_path)
         self.write_to_file(self.file_path, content)
 
     def render(self):

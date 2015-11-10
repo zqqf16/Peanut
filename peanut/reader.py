@@ -4,11 +4,14 @@
 """Markdown reader
 """
 
+from __future__ import unicode_literals
+
 import os
 import six
 import re
 import markdown
 import datetime
+import logging
 
 from six import with_metaclass
 from peanut.meta_yaml import MetaYamlExtension
@@ -151,6 +154,7 @@ def reader_for_file(path):
     file_name = os.path.basename(path)
     for cls in Reader.__subclasses__():
         if cls.regex and cls.regex.match(file_name):
+            logging.debug('Find reader {}'.format(cls))
             return cls()
 
     return None
@@ -162,6 +166,7 @@ def read(path):
 
     reader = reader_for_file(path)
     if not reader:
+        logging.debug('No reader found for file %s', path)
         return None
 
     return reader.read(path)
