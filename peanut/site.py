@@ -50,7 +50,7 @@ class Site(object):
             return
 
         shutil.copy(get_resource('config.yml'), directory)
-        logging.info('Config file created at %s', config_path)
+        logging.info('Config file created at %s', config_path, prefix='   ↳  ')
 
         # copy default theme assets
         assets_path = os.path.join(directory, 'assets/')
@@ -59,7 +59,8 @@ class Site(object):
             return
 
         shutil.copytree(get_resource('themes/default/assets'), assets_path)
-        logging.info('Asset directory created at %s', assets_path)
+        logging.info('Asset directory created at %s',
+                assets_path, prefix='   ↳  ')
 
 
     def load_config(self, config_path):
@@ -87,7 +88,7 @@ class Site(object):
         logging.debug('Load config file {}'.format(config_path))
         load_configs(config_path)
 
-        logging.info('Verify configurations')
+        logging.info('Verifing configurations...')
         verify_configs()
 
         self.template = Template(
@@ -101,7 +102,7 @@ class Site(object):
         """
         draft_dir = os.path.join(configs.pwd, configs.path.draft)
         for f in list_dir(draft_dir):
-            logging.info('Parse draft {}'.format(f))
+            logging.visiable('Reading {}'.format(f))
             self.parse_draft(f)
 
     def parse_draft(self, draft_file):
@@ -109,33 +110,34 @@ class Site(object):
         """
         draft = reader.read(draft_file)
         if not draft:
-            logging.info('Read file %s failed', draft_file)
+            logging.visiable('Failed', prefix='   ✗  ')
             return
 
         title = draft.get('title', None)
         slug = draft.get('slug', None)
         if not title or not slug:
-            logging.info('%s has no title or slug', draft_file)
+            logging.visiable('✗ No title or slug', prefix='   ↳  ')
             return
 
         if not draft['meta'].get('publish', True):
-            logging.debug('Do not publish %s', title)
+            logging.visiable('✗ Don\'t publish', prefix='   ↳  ')
             return
 
         post = Post(title, slug, draft.get('content', None),
                 draft.get('meta', None))
 
         self.posts.append(post)
-        logging.info('Parse post %s successfully', post.title)
+        logging.visiable('✓ %s', post.title, prefix='   ↳  ')
 
 
     def generate(self):
         """Generate static site
         """
-        logging.info('Begin to load drafts')
+        logging.info('Loading drafts...')
         self.load_drafts()
         self.posts.sort(reverse=True)
-        logging.info('%d posts was loadded', len(self.posts))
+        logging.info('%d posts total', len(self.posts),
+                prefix='🍻  ')
 
         writers = [
             (writer.PostWriter, 'posts'),
@@ -148,8 +150,8 @@ class Site(object):
         if configs.sitemap:
             writers.append((writer.SitemapWriter, 'sitemap'))
 
-        logging.info('Begin to render files')
+        logging.info('Rendering files...')
         for writer_class, desp in writers:
-            logging.info('Render %s', desp)
+            logging.visiable(desp)
             w = writer_class(posts=self.posts, template=self.template)
             w.run()

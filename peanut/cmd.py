@@ -38,25 +38,25 @@ def main():
     if debug:
         init_logger(logging.DEBUG)
     elif visiable:
-        init_logger(logging.INFO)
+        init_logger(logging.VISIABLE)
     else:
-        init_logger(logging.WARNING)
+        init_logger(logging.INFO)
 
     if args['init']:
         logging.info('Init peanut environments')
-        site.Site.init()
+        site.Site.init(directory)
         exit(0)
 
     blog = site.Site(directory)
 
-    logging.info('Load configurations')
+    logging.info('Loading configurations...')
     try:
         blog.load_config(config_path)
     except Exception as e:
         logging.critical(e.args[0])
         exit(-1)
 
-    logging.info('Begin to generate')
+    logging.info('Generating...')
     blog.generate()
 
 if __name__ == '__main__':
