@@ -148,8 +148,6 @@ class Site(object):
         logging.info('Loading drafts...')
         self.load_drafts()
         self.posts.sort(reverse=True)
-        logging.info('%d posts total', len(self.posts),
-                prefix='🍻  ')
 
         writers = [
             (writer.PostWriter, 'posts'),
@@ -167,3 +165,6 @@ class Site(object):
             logging.visiable(desp)
             w = writer_class(posts=self.posts, template=self.template)
             w.run()
+
+        logging.info('%d posts', len(self.posts),
+                prefix='🍻  ')
