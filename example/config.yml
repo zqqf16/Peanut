@@ -5,3 +5,4 @@ site:
 theme: default
 path:
     draft: drafts
+pagination: 2

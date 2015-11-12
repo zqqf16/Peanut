@@ -3,11 +3,14 @@
 
 """Template"""
 
-import peanut
-import jinja2
 from os import path
-from jinja2 import FileSystemLoader
+
+import jinja2
+from jinja2 import FileSystemLoader, ChoiceLoader
 from jinja2.exceptions import TemplateNotFound
+
+import peanut
+from peanut.utils import get_resource
 
 
 class SmartLoader(FileSystemLoader):
@@ -35,7 +38,10 @@ class Template(object):
     """Template"""
 
     def __init__(self, path, filters=None, **kwargs):
-        loader = SmartLoader(path)
+        loader = ChoiceLoader([
+            SmartLoader(path),
+            SmartLoader(get_resource('themes/default')),
+        ])
         self.env = jinja2.Environment(
             loader=loader,
             lstrip_blocks=True,
