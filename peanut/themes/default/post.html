@@ -26,9 +26,9 @@
             {{ post.content }}
         </section>
         <footer class="post-footer">
-        {% if author.image %}
+        {% if author.avator %}
         <figure class="author-image">
-            <a class="img" href="{{ author.url }}" style="background-image: url({{ author.image }})"><span class="hidden">{{ author.name }}'s Picture</span></a>
+            <a class="img" href="{{ author.url }}" style="background-image: url({{ author.avator }})"><span class="hidden">{{ author.name }}'s Picture</span></a>
         </figure>
         {% endif %}
         <section class="author">
