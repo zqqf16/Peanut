@@ -5,7 +5,7 @@
 
 from functools import partial
 from datetime import datetime
-from peanut.utils import urljoin
+from peanut.utils import urljoin, real_url
 
 
 # Filters
@@ -13,7 +13,8 @@ from peanut.utils import urljoin
 def asset(config, value):
     """Get asset file url"""
     asset_path = config.path['asset']
-    return urljoin(asset_path, value)
+    rel = urljoin(asset_path, value)
+    return real_url(config.site.url, rel)
 
 def strftime(value, date_format):
     """Date formatter"""

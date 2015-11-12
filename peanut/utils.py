@@ -6,10 +6,10 @@ import re
 import six
 
 try:
-    from urllib.parse import urljoin
+    from urllib.parse import urljoin, urlsplit
     from urllib.request import pathname2url, url2pathname
 except:
-    from urlparse import urljoin
+    from urlparse import urljoin, urlsplit
     from urllib import pathname2url, url2pathname
 
 def to_s(value):
@@ -51,6 +51,12 @@ def url_safe(string):
 
     return '-'.join(new_str.strip().split())
 
+def real_url(base, url):
+    path = urlsplit(base).path
+    if not path.endswith('/'):
+        path = path + '/'
+    url = url.lstrip('/')
+    return urljoin(path, url)
 
 def package_resource(path):
     """Get resource from package

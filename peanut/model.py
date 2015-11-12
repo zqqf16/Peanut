@@ -10,7 +10,7 @@ import re
 import os
 from datetime import datetime
 
-from peanut.utils import path_to_url, url_safe
+from peanut.utils import path_to_url, url_safe, real_url
 from peanut.options import configs, env
 
 
@@ -22,7 +22,7 @@ class BaseModel(object):
 
     @property
     def file_path(self):
-        template = configs.path[self.__class__.layout]
+        template = configs.path.get(self.__class__.layout, '').lstrip('/')
         return url_safe(template.format(**self.__dict__))
 
     @property
@@ -30,7 +30,7 @@ class BaseModel(object):
         relative_url = path_to_url(self.file_path)
         if not relative_url.startswith('/'):
             relative_url = '/'+relative_url
-        return relative_url
+        return real_url(configs.site.url, relative_url)
 
 
 class Tag(BaseModel):

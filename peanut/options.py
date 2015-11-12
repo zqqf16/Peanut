@@ -111,6 +111,9 @@ def verify_path():
     draft = os.path.join(configs.pwd, configs.path.draft)
     if not os.path.isdir(draft):
         raise ValidationError('Draft path {} not found'.format(draft))
+    site_url = configs.site.url
+    if not site_url.startswith('http'):
+        configs.site.url = 'http://'+site_url
 
 def verify_theme():
     """Verify theme configurations"""
