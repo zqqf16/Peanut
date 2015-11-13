@@ -1,7 +1,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 {% for post in posts %}
 	<url>
-		<loc>{{ post.url }}</loc>
+		<loc>{{ post.url|abs_url}}</loc>
 		<lastmod>{{ post.date|strftime('%Y-%m-%d') }}</lastmod>
 		<changefreq>monthly</changefreq>
 	</url>
