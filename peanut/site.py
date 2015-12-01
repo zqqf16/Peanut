@@ -167,4 +167,4 @@ class Site(object):
             w.run()
 
         logging.info('%d posts', len(self.posts),
-                prefix='🍻  ')
+                prefix='🎉  ')
