@@ -1,0 +1,68 @@
+{% extends "default.html" %}
+{% block body_class %}archive-template{% endblock %}
+{% block body %}
+{# The big featured header #}
+<header class="main-header {%if site.cover %}" style="background-image: url({{ site.cover }}){% else %}no-cover{% endif %}">
+    <nav class="main-nav overlay clearfix">
+        {% if site.logo %}
+        <a class="blog-logo" href="{{ site.url }}">
+            <img src="{{ site.logo }}" alt="{{ site.title }}" />
+        </a>
+        {% endif %}
+        {#<a class="menu-button" href="#">
+            <i class="fa fa-bars"></i>
+            <span class="word">Contact</span>
+        </a>#}
+    </nav>
+    <div class="vertical">
+        <div class="main-header-content inner">
+            <h1 class="page-title">{{ site.title }}</h1>
+            <h2 class="page-description">{{ site.description }}</h2>
+            {% if site.links %}
+            <ul class="page-link">
+                {% for link in site.links %}
+                <li class="link-item">
+                    <a href="{{link.url}}" title="{{link.title}}">{{link.title}}</a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% if author.socials %}
+            <ul class="page-social">
+                {% for social in author.socials %}
+                <li class="social-item">
+                    <a href={{social.url}}>
+                        {% if social.icon %}
+                        <i class="fa fa-{{social.icon}}"></i>
+                        <span class="label">{{social.name}}</span>
+                        {% else %}
+                        {{social.name}}
+                        {% endif %}
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+    </div>
+    <a class="scroll-down" href="#content" data-offset="-45"><i class="fa fa-angle-left"></i><span class="hidden">Scroll Down</span></a>
+</header>
+
+{# The main content area on the homepage #}
+<main id="content" class="content" role="main">
+    <div class="post post-list">
+        {% for posts in years %}
+        <h2>{{posts[0].date.year}}</h2>
+        <ol>
+            {% for post in posts %}
+            <li>
+                <a href={{post.url}}>{{post.title}}</a>
+                <time datetime="{{ post.date|strftime('%Y-%m-%d') }}">
+                    {{ post.date|strftime('%d %b %Y') }}</time>
+            </li>
+            {% endfor %}
+        </ol>
+        {% endfor %}
+    </div>
+</main>
+{% endblock %}

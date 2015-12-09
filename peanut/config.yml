@@ -49,6 +49,9 @@ author:
     # Pagination url template
     # pagination: page/{num}/
 
+    # Archive url
+    # archive: archive.html
+
     # Sitemap url
     # sitemap: sitemap.xml
 
@@ -63,6 +66,9 @@ author:
 
 # Whether to create rss or not
 # rss: True
+
+# Whether to create archive page
+# archive: True
 
 # Theme name or path
 # theme: default

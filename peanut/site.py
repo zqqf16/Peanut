@@ -152,13 +152,15 @@ class Site(object):
         writers = [
             (writer.PostWriter, 'posts'),
             (writer.TagWriter, 'tags'),
-            (writer.ArchiveWriter, 'index'),
+            (writer.PageWriter, 'index'),
         ]
 
         if configs.rss:
             writers.append((writer.RssWriter, 'rss'))
         if configs.sitemap:
             writers.append((writer.SitemapWriter, 'sitemap'))
+        if configs.archive:
+            writers.append((writer.ArchiveWriter, 'archive'))
 
         logging.info('Rendering files...')
         for writer_class, desp in writers:

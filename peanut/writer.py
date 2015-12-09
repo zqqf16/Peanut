@@ -78,11 +78,11 @@ class PostWriter(Writer):
         return (prev, next)
 
 
-class ArchiveWriter(Writer):
+class PageWriter(Writer):
     """Archive writer"""
 
     def __init__(self, posts, template, layout=None, base_url=None):
-        super(ArchiveWriter, self).__init__(posts, template)
+        super(PageWriter, self).__init__(posts, template)
         self.base_url = base_url or configs.path.index
         self.layout = layout or 'index'
         self.num_per_page = configs.pagination
@@ -103,7 +103,36 @@ class ArchiveWriter(Writer):
                 prev_page=page.prev, next_page=page.next, **self.context)
 
 
-class TagWriter(ArchiveWriter):
+class ArchiveWriter(Writer):
+    def __init__(self, posts, template):
+        super(ArchiveWriter, self).__init__(posts, template)
+        self.layout = 'archive'
+        self.file_path = configs.path['archive']
+
+    def run(self):
+        content = self.render()
+        self.write_to_file(self.file_path, content)
+
+    def render(self):
+        years = [posts for posts in self.posts_per_year()]
+        return self.template.render(self.layout, years=years)
+
+    def posts_per_year(self):
+        # Assume posts has been sorted.
+        year = self.posts[0].date.year
+        res = []
+        count = len(self.posts)
+        for i, post in enumerate(self.posts):
+            if year == post.date.year:
+                res.append(post)
+                if i == count - 1:
+                    yield res
+                continue
+            yield res
+            year = post.date.year
+            res = []
+
+class TagWriter(PageWriter):
     """Tag writer
     """
 

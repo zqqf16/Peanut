@@ -1190,6 +1190,46 @@ body:not(.post-template) .post-title {
     color: #dd4b39;
 }
 
+.post-list {
+    padding: 0;
+    margin-top: 0;
+	border: none;
+}
+
+.post-list:after {
+	border: none;
+}
+
+.post-list > h2 {
+	position: relative;
+	display: inline-block;
+	float: left;
+	margin-left: -10rem;
+}
+
+.post-list > ol {
+	padding-left: 0;
+    list-style-type: none;
+}
+
+.post-list > ol > li {
+	padding: 1.25rem 0;
+	border-bottom: #EBF2F6 1px solid;
+}
+
+.post-list > ol > li > time {
+    float: right;
+    color: #777;
+    letter-spacing: 2px;
+    display: inline-block;
+    text-transform: uppercase;
+    font-size: 1.3rem;
+    white-space: nowrap;
+}
+
+.post-list > ol > li > a {
+	text-decoration: none;
+}
 
 /* ==========================================================================
    6. Author profile
@@ -1862,6 +1902,28 @@ body:not(.post-template) .post-title {
 
     .page-description {
         font-size: 1.6rem;
+    }
+
+    .post-list {
+        margin: 3rem 0;
+        text-align: center
+    }
+
+	.post-list > h2 {
+		margin: 0;
+		text-align: center;
+		float: none;
+	}
+
+    .post-list > ol > li {
+        margin-bottom: 2rem
+    }
+
+    .post-list > ol > li > time {
+        display: block;
+        float: none;
+        letter-spacing: 1px;
+        padding: 0
     }
 
     h1, h2, h3,
