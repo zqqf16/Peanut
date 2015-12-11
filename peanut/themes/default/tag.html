@@ -1,4 +1,5 @@
 {% extends "default.html" %}
+{% block title %}{{ tag.title }}{% endblock %}
 {% block body %}
 
 <header class="main-header tag-head {% if tag.image %}" style="background-image: url({{ tag.image }}){% else %}{% if site.cover %}" style="background-image: url({{ site.cover }}){% else %}no-cover{% endif %}{% endif %}">
