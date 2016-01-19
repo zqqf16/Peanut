@@ -130,7 +130,7 @@ class ArchiveWriter(Writer):
                 continue
             yield res
             year = post.date.year
-            res = []
+            res = [post]
 
 class TagWriter(PageWriter):
     """Tag writer
