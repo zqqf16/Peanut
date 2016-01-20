@@ -8,9 +8,12 @@
     <meta name="HandheldFriendly" content="True" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="shortcut icon" href="{{ 'favicon.ico'|asset }}">
-    <link rel="stylesheet" type="text/css" href="{{ 'css/screen.css'|asset }}" />
+    <link rel="stylesheet" type="text/css" href="{{ 'css/screen-min.css'|asset }}" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+    <link rel="stylesheet" type="text/css" href="//fonts.useso.com/css?family=Merriweather:300,700,700italic,300italic|Open+Sans:700,400" />
+    <script type="text/javascript" src="http://libs.useso.com/js/jquery/1.11.1/jquery.min.js"></script>
+    <script type="text/javascript" src="{{ 'js/jquery.fitvids.js'|asset }}"></script>
+    <script type="text/javascript" src="{{ 'js/index.js'|asset }}"></script>
     {% block header %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %} nav-closed">
@@ -39,9 +42,6 @@
         </footer>
     </div>
     {% block footer %}{% endblock %}
-    <script type="text/javascript" src="{{ 'js/jquery-1.11.3.min.js'|asset }}"></script>
-    <script type="text/javascript" src="{{ 'js/jquery.fitvids.js'|asset }}"></script>
-    <script type="text/javascript" src="{{ 'js/index.js'|asset }}"></script>
     {% if site.get('google_analytics') %}
         {% include 'google_analytics.html' %}
     {% endif %}
