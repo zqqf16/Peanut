@@ -1,5 +1,7 @@
  一个静态博客生成工具，由[zqqf16.github.com](https://github.com/zqqf16/zqqf16.github.com)演变而来，目前正在开发中~
 
+[![Build Status](https://travis-ci.org/zqqf16/Peanut.svg?branch=master)](https://travis-ci.org/zqqf16/Peanut)
+
 ### 安装
 
 ``` bash
