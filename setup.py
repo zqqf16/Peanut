@@ -70,4 +70,6 @@ setup(
             'peanut=peanut.cmd:main',
         ],
     },
+
+    test_suite = 'test',
 )
