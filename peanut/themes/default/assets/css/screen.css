@@ -1195,7 +1195,8 @@ body:not(.post-template) .post-title {
 .post-list {
     padding: 0;
     margin-top: 0;
-	border: none;
+    border: none;
+    max-width: 710px;
 }
 
 .post-list:after {
@@ -1681,6 +1682,12 @@ body:not(.post-template) .post-title {
 
     .post {
         font-size: 0.95em
+    }
+
+    .post-list > h2 {
+        display: inline-block;
+        float: none;
+        margin-left: 0;
     }
 
     body:not(.post-template) .post-title {
