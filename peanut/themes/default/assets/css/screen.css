@@ -287,6 +287,8 @@ pre {
     overflow: auto;
     background: #F7FAFB;
     border-radius: 3px;
+    word-wrap: normal;
+    line-height: 1.2em;
 }
 
 pre code, pre tt {
@@ -392,7 +394,7 @@ margin on the iframe, cause it breaks stuff. */
 .inner {
     position: relative;
     width: 80%;
-    max-width: 710px;
+    max-width: 960px;
     margin: 0 auto;
 }
 
@@ -910,7 +912,7 @@ body.nav-opened .nav {
 .post {
     position: relative;
     width: 80%;
-    max-width: 710px;
+    max-width: 960px;
     margin: 4rem auto;
     padding-bottom: 4rem;
     border-bottom: #EBF2F6 1px solid;
@@ -1519,7 +1521,7 @@ body:not(.post-template) .post-title {
 .pagination {
     position: relative;
     width: 80%;
-    max-width: 710px;
+    max-width: 960px;
     margin: 4rem auto;
     font-family: "Open Sans", sans-serif;
     font-size: 1.3rem;
