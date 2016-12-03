@@ -5,6 +5,7 @@
 
 Usage:
   peanut init [(-v|-d)] [<directory>]
+  peanut ghost <url> <username> <password>
   peanut [(-v|-d)] [-c | --config <config_file_path>] [<directory>]
   peanut (-h | --help)
   peanut --version
@@ -55,6 +56,16 @@ def main():
     except Exception as e:
         logging.critical(e.args[0])
         exit(-1)
+        
+    if args['ghost']:
+        url = args.get('<url>')
+        user = args.get('<username>')
+        password = args.get('<password>')
+        if not url or not user or not password:
+            logging.critical('Invalid arguments')
+            exit(-1)
+        blog.push(url, user, password)
+        exit(0)
 
     logging.info('Generating...')
     blog.generate()

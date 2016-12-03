@@ -91,6 +91,8 @@ class MetaYamlPreprocessor(Preprocessor):
             meta = {k.lower(): v for k, v in meta.items()}
 
             self.markdown.Meta = meta
+            
+        self.markdown.Raw = '\n'.join(lines)
         return lines
 
 

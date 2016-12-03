@@ -138,7 +138,7 @@ class MarkdownReader(with_metaclass(Singleton, Reader)):
                 draft = draft.decode('utf-8')
             content = self.parser.convert(draft.strip(' \n'))
 
-        res.update({'content': content, 'draft': draft})
+        res.update({'content': content, 'raw': self.md_parser.Raw})
         if self.md_parser.Meta:
             new_meta = self.parse_meta(self.md_parser.Meta)
             res['title'] = new_meta.pop('title')

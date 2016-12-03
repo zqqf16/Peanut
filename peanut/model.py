@@ -56,10 +56,11 @@ class Post(BaseModel):
 
     layout = 'post'
 
-    def __init__(self, title, slug, content=None, meta=None):
+    def __init__(self, title, slug, raw=None, content=None, meta=None):
         self.title = title
         self.slug = url_safe(slug)
         self.content = content
+        self.raw = raw
 
         meta = meta or {}
         self.date = meta.pop('date', None) or datetime.now()

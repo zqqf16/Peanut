@@ -57,6 +57,12 @@ python -m SimpleHTTPServer
 python3 -m http.server
 ```
 
+#### 迁移到 Ghost
+
+``` bash
+peanut ghost http://your_ghost.domain username password
+```
+
 ### 依赖
 
 - Jinja2

@@ -4,3 +4,4 @@ Pygments
 PyYAML
 docopt
 six
+requests

@@ -18,6 +18,7 @@ from peanut.options import ValidationError
 from peanut.template import Template
 from peanut.context import get_filters
 from peanut.utils import list_dir, get_resource
+from peanut.ghost import get_token, push
 
 try:
     FileNotFoundError
@@ -135,12 +136,28 @@ class Site(object):
             logging.visiable('✗ Don\'t publish', prefix='   ↳  ')
             return
 
-        post = Post(title, slug, draft.get('content', None),
+        post = Post(title, slug, draft.get('raw', None), draft.get('content', None),
                 draft.get('meta', None))
 
         self.posts.append(post)
         logging.visiable('✓ %s', post.title, prefix='   ↳  ')
 
+
+    def push(self, url, username, password):
+        """Push post to Ghost server
+        """
+        logging.info('Loading drafts...')
+        self.load_drafts()
+        self.posts.sort(reverse=True)
+        
+        logging.info('Getting token...')
+        token = get_token(url, username, password)
+        if not token:
+            return
+        
+        push(url, token, self.posts)
+        logging.info('%d posts', len(self.posts), prefix='🎉  ')
+        
 
     def generate(self):
         """Generate static site

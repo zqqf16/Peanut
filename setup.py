@@ -61,7 +61,7 @@ setup(
         'Programming Language :: Python :: 3.4',
     ],
 
-    install_requires=['Jinja2', 'Markdown', 'Pygments', 'PyYAML', 'six', 'docopt'],
+    install_requires=['Jinja2', 'Markdown', 'Pygments', 'PyYAML', 'six', 'docopt', 'requests'],
 
     py_modules=['peanut'],
 
