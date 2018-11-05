@@ -69,6 +69,12 @@ class Post(BaseModel):
         self.top = meta.pop('top', False)
         self.tag_titles = meta.pop('tags', [])
 
+        image = meta.pop('image', None)
+        if isinstance(image, dict):
+            self.image = image.get('feature', None)
+        else:
+            self.image = image
+
         self.meta = meta
 
     @property
