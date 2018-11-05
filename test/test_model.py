@@ -17,18 +17,23 @@ class TestPost(unittest.TestCase):
         meta = {
             'date': None,
             'tags': ['hello', 'world'],
-            'layout': None,
+            'layout': 'post',
             'top': True,
             'publish': False,
             'author': 'zqqf16',
+            'image' : 'http://test.com/test.png',
+            'test' : 'test'
         }
-        post = Post('Hello world', 'hello_world', 'Hello world', meta)
+        post = Post('Hello world', 'hello_world', 'Hello world', meta=meta)
 
         now = datetime.now()
 
         self.assertEqual(post.title, 'Hello world')
         self.assertEqual(post.slug, 'hello_world')
         self.assertEqual(post.author, 'zqqf16')
+        self.assertEqual(post.layout, 'post')
+        self.assertEqual(post.test, 'test')
+        self.assertEqual(post.image, 'http://test.com/test.png')
         self.assertEqual(post.date.year, now.year)
         self.assertTrue(post.top)
         self.assertFalse(post.publish)
@@ -44,6 +49,20 @@ class TestPost(unittest.TestCase):
         post2 = Post('1', '1', '')
         post2.date = datetime.now()
         self.assertTrue(post < post2)
+
+    def test_image(self):
+        meta = {
+            'image' : 'http://test.com/test.png',
+        }
+        post = Post('Hello world', 'hello_world', 'Hello world', meta=meta)
+        self.assertEqual(post.image, 'http://test.com/test.png')
+
+        meta = {
+            'image' : {'feature': 'http://test.com/test.png'},
+        }
+        post = Post('Hello world', 'hello_world', 'Hello world', meta=meta)
+        self.assertEqual(post.image, 'http://test.com/test.png')
+
 
     def test_relationships(self):
         tags=['test', 'relation']
