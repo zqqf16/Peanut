@@ -102,7 +102,6 @@ class MarkdownReader(with_metaclass(Singleton, Reader)):
             'markdown.extensions.codehilite',   # CodeHilite
             'markdown.extensions.footnotes',    # Footnotes
             'markdown.extensions.tables',       # Tables
-            'markdown.extensions.smart_strong', # Smart Strong
             'markdown.extensions.toc',          # Table of Contents
             MetaYamlExtension(),                # Meta-YAML
         ]
