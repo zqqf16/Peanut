@@ -90,9 +90,9 @@ class MetaYamlPreprocessor(Preprocessor):
             # Compat with PyMarkdown's meta: Keys are lowercase, values are lists
             meta = {k.lower(): v for k, v in meta.items()}
 
-            self.markdown.Meta = meta
+            self.md.Meta = meta
             
-        self.markdown.Raw = '\n'.join(lines)
+        self.md.Raw = '\n'.join(lines)
         return lines
 
 
