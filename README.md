@@ -1,6 +1,9 @@
  一个静态博客生成工具，由[zqqf16.github.com](https://github.com/zqqf16/zqqf16.github.com)演变而来，目前正在开发中~
 
-[![Build Status](https://travis-ci.org/zqqf16/Peanut.svg?branch=master)](https://travis-ci.org/zqqf16/Peanut)
+![CI Status](https://github.com/zqqf16/Peanut/actions/workflows/main.yml/badge.svg)
+
+### Demo
+[blog.zorro.im](https://blog.zorro.im)
 
 ### 安装
 
@@ -76,7 +79,7 @@ peanut ghost http://your_ghost.domain username password
 
 The MIT License (MIT)
 
-Copyright (c) 2015 zqqf16
+Copyright (c) 2015-2021 zqqf16
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
