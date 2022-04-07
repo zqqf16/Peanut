@@ -1,12 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import six
 import logging
-
 from functools import partial
-
-from peanut.utils import to_s, to_u
+from peanut.utils import to_s
 
 
 def init_logger(level):

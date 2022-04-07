@@ -5,9 +5,7 @@
 
 from __future__ import unicode_literals
 
-
 import os
-import six
 import logging
 
 from peanut.options import configs, env
@@ -37,11 +35,7 @@ class Writer(object):
             pass
 
         with open(file_path, 'w') as f:
-            if six.PY2:
-                f.write(content.encode('utf-8'))
-            else:
-                f.write(content)
-        f.close()
+            f.write(content)
 
     def run(self):
         return NotImplemented

@@ -3,7 +3,6 @@
 
 import os
 import re
-import six
 import builtins
 
 try:
@@ -20,13 +19,9 @@ def to_u(value):
     return str(value)
 
 def path_to_url(path):
-    if six.PY2:
-        path = path.encode('utf-8')
     return pathname2url(path)
 
 def url_to_path(url):
-    if six.PY2:
-        url = url.encode('utf-8')
     return url2pathname(url)
 
 def url_safe(string):

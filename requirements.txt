@@ -1,7 +1,6 @@
-Jinja2
-Markdown
-Pygments
-PyYAML
-docopt
-six
-requests
+Jinja2>=3.1.1
+Markdown>=3.3.6
+Pygments>=2.11.2
+PyYAML>=6.0
+docopt>=0.6.2
+requests>=2.27.1

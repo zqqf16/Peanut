@@ -11,7 +11,7 @@ import os
 from datetime import datetime
 
 from peanut.utils import path_to_url, url_safe, real_url
-from peanut.options import configs, env
+from peanut.options import configs
 
 
 class BaseModel(object):

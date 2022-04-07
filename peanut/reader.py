@@ -7,13 +7,11 @@
 from __future__ import unicode_literals
 
 import os
-import six
 import re
 import markdown
 import datetime
 import logging
 
-from six import with_metaclass
 from peanut.meta_yaml import MetaYamlExtension
 
 
@@ -73,7 +71,7 @@ class Reader(object):
         return NotImplemented
 
 
-class MarkdownReader(with_metaclass(Singleton, Reader)):
+class MarkdownReader(Reader, metaclass=Singleton):
     """Markdown reader
     """
 
@@ -133,8 +131,6 @@ class MarkdownReader(with_metaclass(Singleton, Reader)):
 
         with open(path, 'r') as f:
             draft = f.read()
-            if six.PY2:
-                draft = draft.decode('utf-8')
             content = self.parser.convert(draft.strip(' \n'))
 
         res.update({'content': content, 'raw': self.md_parser.Raw})
