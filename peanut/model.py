@@ -1,177 +1,185 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+"""Domain models used by Peanut."""
 
-"""Post, Tag and Category
-"""
+from __future__ import annotations
 
-from __future__ import unicode_literals
-
+import posixpath
 import re
-import os
 from datetime import datetime
+from typing import Any, Dict, Iterable, List, Optional
 
-from peanut.utils import path_to_url, url_safe, real_url
 from peanut.options import configs
+from peanut.utils import path_to_url, real_url, url_safe
 
 
-class BaseModel(object):
-    """Base model class
-    """
+class BaseModel:
+    """Base model class providing path helpers."""
 
-    layout = None
+    layout: Optional[str] = None
 
     @property
-    def file_path(self):
-        template = configs.path.get(self.__class__.layout, '').lstrip('/')
+    def file_path(self) -> str:
+        template = str(configs.path.get(self.__class__.layout, "")).lstrip("/")
         return url_safe(template.format(**self.__dict__))
 
     @property
-    def url(self):
+    def url(self) -> str:
         relative_url = path_to_url(self.file_path)
-        if not relative_url.startswith('/'):
-            relative_url = '/'+relative_url
+        if not relative_url.startswith("/"):
+            relative_url = "/" + relative_url
         return real_url(configs.site.url, relative_url)
 
 
 class Tag(BaseModel):
-    """Tag model
-    """
+    """Tag model."""
 
-    layout = 'tag'
+    layout = "tag"
 
-    def __init__(self, title):
+    def __init__(self, title: str) -> None:
         self.title = title
         self.slug = url_safe(title)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Tag):
+            return NotImplemented
         return self.title == other.title
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.title)
 
 
 class Post(BaseModel):
-    """Post model
-    """
+    """Post model."""
 
-    layout = 'post'
+    layout = "post"
 
-    def __init__(self, title, slug, raw=None, content=None, meta=None):
+    def __init__(
+        self,
+        title: str,
+        slug: str,
+        raw: Optional[str] = None,
+        content: Optional[str] = None,
+        meta: Optional[Dict[str, Any]] = None,
+    ) -> None:
         self.title = title
         self.slug = url_safe(slug)
         self.content = content
         self.raw = raw
 
-        meta = meta or {}
-        self.date = meta.pop('date', None) or datetime.now()
-        self.publish = meta.pop('publish', True)
-        self.layout = meta.pop('layout', Post.layout)
-        self.top = meta.pop('top', False)
-        self.tag_titles = meta.pop('tags', [])
+        metadata = dict(meta or {})
+        self.date = metadata.pop("date", None) or datetime.now()
+        self.publish = metadata.pop("publish", True)
+        self.layout = metadata.pop("layout", Post.layout)
+        self.top = metadata.pop("top", False)
+        self.tag_titles = metadata.pop("tags", [])
 
-        image = meta.pop('image', None)
+        image = metadata.pop("image", None)
         if isinstance(image, dict):
-            self.image = image.get('feature', None)
+            self.image = image.get("feature")
         else:
             self.image = image
 
-        self.meta = meta
+        self.meta = metadata
 
     @property
-    def tags(self):
-        return [Tag(t) for t in self.tag_titles]
+    def tags(self) -> List[Tag]:
+        return [Tag(title) for title in self.tag_titles]
 
-    def __getattr__(self, key):
+    def __getattr__(self, key: str) -> Any:
         try:
-            return super(Post, self).__getattr__(key)
-        except:
-            pass
-        return self.meta.get(key)
+            return super().__getattribute__(key)
+        except AttributeError:
+            return self.meta.get(key)
 
-    def __lt__(self, other):
+    def __lt__(self, other: "Post") -> bool:
         return self.date < other.date
 
 
-class Pagination(object):
-    """Pagination"""
+class Pagination:
+    """Pagination helper."""
 
-    def __init__(self, posts, page=1, base_url=None, posts_per_page = 5):
-        self._posts = posts
-        # page number starts from 1
+    def __init__(
+        self,
+        posts: Iterable[Post],
+        page: int = 1,
+        base_url: Optional[str] = None,
+        posts_per_page: int = 5,
+    ) -> None:
+        self._posts = list(posts)
         self.page = page
-        self.base_url = base_url
-        if posts_per_page == 0:
-            posts_per_page = len(self._posts)
-        self.posts_per_page = posts_per_page
+        self.base_url = base_url or ""
+        self.posts_per_page = posts_per_page or len(self._posts)
 
-        self.path = None
-        self.url = None
+        self.path: Optional[str] = None
+        self.url: Optional[str] = None
         self.parse_path_and_url()
 
-    def parse_path_and_url(self):
+    def parse_path_and_url(self) -> None:
         template = configs.path.pagination
-        relative_path = template.format(
-            number=self.page,
-            num=self.page,
-            n=self.page
-        )
+        relative_path = template.format(number=self.page, num=self.page, n=self.page)
 
         if self.page == 1:
-            relative_path = ''
+            relative_path = ""
 
-        file_path = None
-        url = None
-        if re.search(r'index.html?$', self.base_url):
-            # If base_url ends with index.html or index.htm,
-            # insert page path before the index.*
-            parent, index = os.path.split(self.base_url)
-            url = file_path = os.path.join(parent, relative_path, index)
+        base_url = self.base_url or ""
+        if re.search(r"index.html?$", base_url):
+            parent, index_name = posixpath.split(base_url)
+            url = file_path = posixpath.join(parent, relative_path, index_name)
         else:
-            if not self.base_url.endswith('/'):
-                self.base_url = self.base_url + '/'
+            if not base_url.endswith("/"):
+                base_url = f"{base_url}/"
             else:
-                if relative_path != '' and not relative_path.endswith('/'):
-                    relative_path = relative_path + '/'
-            url = os.path.join(self.base_url, relative_path)
-            file_path = os.path.join(url, 'index.html')
+                if relative_path and not relative_path.endswith("/"):
+                    relative_path = f"{relative_path}/"
+            url = posixpath.join(base_url, relative_path)
+            file_path = posixpath.join(url, "index.html")
 
-        if not url.startswith('/'):
-            url = '/' + url
-        if file_path.startswith('/'):
+        if not url.startswith("/"):
+            url = "/" + url
+        if file_path.startswith("/"):
             file_path = file_path[1:]
 
         self.file_path = url_safe(file_path)
         self.url = url_safe(url)
 
     @property
-    def posts(self):
+    def posts(self) -> List[Post]:
         start = (self.page - 1) * self.posts_per_page
         end = start + self.posts_per_page
         return self._posts[start:end]
 
     @property
-    def total(self):
+    def total(self) -> int:
         if self.posts_per_page == 0:
             return 1
-        else:
-            return int((len(self._posts)-1)/self.posts_per_page) + 1
+        return int((len(self._posts) - 1) / self.posts_per_page) + 1
 
     @property
-    def next(self):
+    def next(self) -> Optional["Pagination"]:
         if self.page == self.total:
             return None
-        return Pagination(self._posts, self.page+1,
-                self.base_url, self.posts_per_page)
+        return Pagination(
+            self._posts,
+            self.page + 1,
+            self.base_url,
+            self.posts_per_page,
+        )
 
     @property
-    def prev(self):
+    def prev(self) -> Optional["Pagination"]:
         if self.page == 1:
             return None
-        return Pagination(self._posts, self.page-1,
-                self.base_url, self.posts_per_page)
+        return Pagination(
+            self._posts,
+            self.page - 1,
+            self.base_url,
+            self.posts_per_page,
+        )
 
-    def iterate(self):
-        curr = self
-        for i in range(curr.page-1, self.total):
-            yield curr
-            curr = curr.next
+    def iterate(self) -> Iterable["Pagination"]:
+        current = self
+        for _ in range(self.page - 1, self.total):
+            yield current
+            current = current.next
+            if current is None:
+                break
+

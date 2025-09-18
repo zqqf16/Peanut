@@ -1,188 +1,192 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+"""Site orchestration logic for Peanut."""
 
-from __future__ import unicode_literals
+from __future__ import annotations
 
-import os
-import shutil
 import logging
+import shutil
+from pathlib import Path
+from typing import Iterable, Optional
 
-import peanut
 import peanut.reader as reader
 import peanut.writer as writer
-
+from peanut.context import get_filters
+from peanut.ghost import get_token, push
 from peanut.model import Post
 from peanut.options import configs, load_configs, verify_configs
-from peanut.options import ValidationError
 from peanut.template import Template
-from peanut.context import get_filters
-from peanut.utils import list_dir, get_resource
-from peanut.ghost import get_token, push
-
-try:
-    FileNotFoundError
-except:
-    FileNotFoundError = IOError
+from peanut.utils import get_resource, list_dir
 
 
-class Site(object):
-    """Site"""
+class Site:
+    """Manage Peanut site generation and publication."""
 
-    default_config = ['_config.yaml', 'config.yaml',
-            '_config.yml', 'config.yml']
+    default_config: Iterable[str] = (
+        "_config.yaml",
+        "config.yaml",
+        "_config.yml",
+        "config.yml",
+    )
 
-    def __init__(self, directory='.'):
+    def __init__(self, directory: Path | str = ".") -> None:
+        resolved = Path(directory).resolve()
+        logging.debug("Directory is %s", resolved)
 
-        logging.debug('Directory is {}'.format(directory))
-
-        self.curdir = directory
-        self.posts = []
-        self.template = None
+        self.curdir: Path = resolved
+        self.posts: list[Post] = []
+        self.template: Optional[Template] = None
 
     @staticmethod
-    def init(directory='./'):
-        """Init peanut environments
-        """
-        # copy default config
-        config_path = os.path.join(directory, 'config.yml')
-        if os.path.isfile(config_path):
-            logging.error('Config file %s already exists', config_path)
+    def init(directory: Path | str = ".") -> None:
+        """Initialise a Peanut workspace with default assets."""
+        target_dir = Path(directory).resolve()
+
+        config_path = target_dir / "config.yml"
+        if config_path.is_file():
+            logging.error("Config file %s already exists", config_path, prefix="   ↳  ")
             return
 
-        shutil.copy(get_resource('config.yml'), directory)
-        logging.info('Config file created at %s', config_path, prefix='   ↳  ')
+        shutil.copy(get_resource("config.yml"), config_path)
+        logging.info(
+            "Config file created at %s",
+            config_path,
+            prefix="   ↳  ",
+        )
 
-        # copy default theme assets
-        assets_path = os.path.join(directory, 'assets/')
-        if os.path.isdir(assets_path):
-            logging.error('Asset directory %s alerady exists', assets_path)
+        assets_path = target_dir / "assets"
+        if assets_path.exists():
+            logging.error("Asset directory %s already exists", assets_path, prefix="   ↳  ")
             return
 
-        shutil.copytree(get_resource('themes/default/assets'), assets_path)
-        logging.info('Asset directory created at %s',
-                assets_path, prefix='   ↳  ')
+        shutil.copytree(get_resource("themes/default/assets"), assets_path)
+        logging.info(
+            "Asset directory created at %s",
+            assets_path,
+            prefix="   ↳  ",
+        )
 
-        # mkdir
-        draft_path = os.path.join(directory, 'drafts/')
-        if os.path.isdir(draft_path):
-            logging.info('Draft directory already exists', prefix='   ↳  ')
+        draft_path = target_dir / "drafts"
+        if draft_path.exists():
+            logging.info("Draft directory already exists", prefix="   ↳  ")
             return
+
         try:
-            os.makedirs(draft_path)
+            draft_path.mkdir(parents=True, exist_ok=False)
         except OSError:
-            logging.error('Create draft directory failed')
-        logging.info('Draft directory created at %s', draft_path,
-                prefix='   ↳  ')
+            logging.error("Create draft directory failed")
+        else:
+            logging.info(
+                "Draft directory created at %s", draft_path, prefix="   ↳  "
+            )
 
+    def load_config(self, config_path: Optional[str]) -> None:
+        """Load configuration from *config_path* or default locations."""
+        configs.pwd = str(self.curdir)
+        candidate: Optional[str] = config_path
 
-    def load_config(self, config_path):
-        """Load config file from file
-        """
-        configs.pwd = self.curdir
-        if not config_path:
-            logging.debug('No config path is specified, try default ones')
+        if not candidate:
+            logging.debug("No config path is specified, try default ones")
             for file_name in self.default_config:
-                p = os.path.join(self.curdir, file_name)
-                if os.path.isfile(p):
-                    logging.debug('Find config file named %s', file_name)
-                    config_path = file_name
+                potential = self.curdir / file_name
+                if potential.is_file():
+                    logging.debug("Find config file named %s", file_name)
+                    candidate = file_name
                     break
             else:
-                logging.debug('Config file with default names not found')
-                raise FileNotFoundError('Config file not found at directory \
-{}'.format(self.curdir))
+                logging.debug("Config file with default names not found")
+                raise FileNotFoundError(
+                    f"Config file not found at directory {self.curdir}"
+                )
         else:
-            if not os.path.isfile(os.path.join(self.curdir, config_path)):
-                logging.debug('%s is not a file', config_path)
-                raise FileNotFoundError('Config file not found at path {}'\
-                        .format(config_path))
+            potential = self.curdir / candidate
+            if not potential.is_file():
+                logging.debug("%s is not a file", candidate)
+                raise FileNotFoundError(f"Config file not found at path {candidate}")
 
-        logging.debug('Load config file {}'.format(config_path))
-        load_configs(config_path)
+        logging.debug("Load config file %s", candidate)
+        load_configs(candidate)
 
-        logging.info('Verifing configurations...')
+        logging.info("Verifing configurations...")
         verify_configs()
 
         self.template = Template(
-                configs.theme_path,
-                filters=get_filters(configs),
-                site=configs.site,
-                author=configs.author)
+            configs.theme_path,
+            filters=get_filters(configs),
+            site=configs.site,
+            author=configs.author,
+        )
 
-    def load_drafts(self):
-        """Load all drafts
-        """
-        draft_dir = os.path.join(configs.pwd, configs.path.draft)
-        for f in list_dir(draft_dir):
-            logging.visiable('Reading {}'.format(f))
-            self.parse_draft(f)
+    def load_drafts(self) -> None:
+        """Load all drafts from the configured directory."""
+        draft_dir = Path(configs.pwd) / configs.path.draft
+        for draft_file in list_dir(draft_dir):
+            logging.visiable("Reading %s", draft_file)
+            self.parse_draft(draft_file)
 
-    def parse_draft(self, draft_file):
-        """Parse draft file
-        """
+    def parse_draft(self, draft_file: str) -> None:
+        """Parse a draft file and append it to the in-memory post list."""
         draft = reader.read(draft_file)
         if not draft:
-            logging.visiable('Failed', prefix='   ✗  ')
+            logging.visiable("Failed", prefix="   ✗  ")
             return
 
-        title = draft.get('title', None)
-        slug = draft.get('slug', None)
+        title = draft.get("title")
+        slug = draft.get("slug")
         if not title or not slug:
-            logging.visiable('✗ No title or slug', prefix='   ↳  ')
+            logging.visiable("✗ No title or slug", prefix="   ↳  ")
             return
 
-        if not draft['meta'].get('publish', True):
-            logging.visiable('✗ Don\'t publish', prefix='   ↳  ')
+        if not draft["meta"].get("publish", True):
+            logging.visiable("✗ Don't publish", prefix="   ↳  ")
             return
 
-        post = Post(title, slug, draft.get('raw', None), draft.get('content', None),
-                draft.get('meta', None))
+        post = Post(
+            title,
+            slug,
+            draft.get("raw"),
+            draft.get("content"),
+            draft.get("meta"),
+        )
 
         self.posts.append(post)
-        logging.visiable('✓ %s', post.title, prefix='   ↳  ')
+        logging.visiable("✓ %s", post.title, prefix="   ↳  ")
 
-
-    def push(self, url, username, password):
-        """Push post to Ghost server
-        """
-        logging.info('Loading drafts...')
+    def push(self, url: str, username: str, password: str) -> None:
+        """Push posts to a Ghost server."""
+        logging.info("Loading drafts...")
         self.load_drafts()
         self.posts.sort(reverse=True)
-        
-        logging.info('Getting token...')
+
+        logging.info("Getting token...")
         token = get_token(url, username, password)
         if not token:
             return
-        
-        push(url, token, self.posts)
-        logging.info('%d posts', len(self.posts), prefix='🎉  ')
-        
 
-    def generate(self):
-        """Generate static site
-        """
-        logging.info('Loading drafts...')
+        push(url, token, self.posts)
+        logging.info("%d posts", len(self.posts), prefix="🎉  ")
+
+    def generate(self) -> None:
+        """Generate the static site."""
+        logging.info("Loading drafts...")
         self.load_drafts()
         self.posts.sort(reverse=True)
 
         writers = [
-            (writer.PostWriter, 'posts'),
-            (writer.TagWriter, 'tags'),
-            (writer.PageWriter, 'index'),
+            (writer.PostWriter, "posts"),
+            (writer.TagWriter, "tags"),
+            (writer.PageWriter, "index"),
         ]
 
         if configs.rss:
-            writers.append((writer.RssWriter, 'rss'))
+            writers.append((writer.RssWriter, "rss"))
         if configs.sitemap:
-            writers.append((writer.SitemapWriter, 'sitemap'))
+            writers.append((writer.SitemapWriter, "sitemap"))
         if configs.archive:
-            writers.append((writer.ArchiveWriter, 'archive'))
+            writers.append((writer.ArchiveWriter, "archive"))
 
-        logging.info('Rendering files...')
-        for writer_class, desp in writers:
-            logging.visiable(desp)
-            w = writer_class(posts=self.posts, template=self.template)
-            w.run()
+        logging.info("Rendering files...")
+        for writer_class, description in writers:
+            logging.visiable(description)
+            writer_instance = writer_class(posts=self.posts, template=self.template)
+            writer_instance.run()
 
-        logging.info('%d posts', len(self.posts),
-                prefix='🎉  ')
+        logging.info("%d posts", len(self.posts), prefix="🎉  ")

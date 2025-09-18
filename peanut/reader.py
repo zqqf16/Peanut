@@ -1,167 +1,148 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+"""Markdown reader utilities."""
 
-"""Markdown reader
-"""
+from __future__ import annotations
 
-from __future__ import unicode_literals
-
-import os
-import re
-import markdown
-import datetime
+import datetime as dt
 import logging
+import re
+from pathlib import Path
+from typing import Any, Dict, Iterable, List, Optional
+
+import markdown
 
 from peanut.meta_yaml import MetaYamlExtension
 
 
-def parser_list(value):
+def parser_list(value: Any) -> List[Any]:
     if isinstance(value, list):
         return value
-    else:
-        return [value]
+    return [value]
 
-def parser_single(value):
+
+def parser_single(value: Any) -> Any:
     if isinstance(value, list):
         return value[0]
-    else:
-        return value
+    return value
 
-def parser_bool(value):
-    value = parser_single(value)
-    if isinstance(value, bool):
-        return value
-    if value in ['True', 'true', 'Yes', 'yes']:
-        return True
-    else:
-        return False
 
-def parser_date(value):
-    if isinstance(value, datetime.datetime):
+def parser_bool(value: Any) -> bool:
+    candidate = parser_single(value)
+    if isinstance(candidate, bool):
+        return candidate
+    return str(candidate).lower() in {"true", "yes", "1"}
+
+
+def parser_date(value: Any) -> dt.datetime:
+    if isinstance(value, dt.datetime):
         return value
-    if isinstance(value, datetime.date):
-        return datetime.datetime(value.year, value.month, value.day)
+    if isinstance(value, dt.date):
+        return dt.datetime.combine(value, dt.time.min)
 
     date_string = parser_single(value)
-    date = datetime.datetime.now()
-    for date_format in ['%Y-%m-%d', '%Y%m%d', '%Y-%m-%d %H:%M', '%Y%m%d %H:%M']:
+    for pattern in ("%Y-%m-%d", "%Y%m%d", "%Y-%m-%d %H:%M", "%Y%m%d %H:%M"):
         try:
-            date = datetime.datetime.strptime(date_string, date_format)
-        except:
-            pass
-    return date
+            return dt.datetime.strptime(str(date_string), pattern)
+        except ValueError:
+            continue
+    return dt.datetime.now()
 
 
 class Singleton(type):
-    _instances = {}
-    def __call__(cls, *args, **kwargs):
+    _instances: Dict[type, "MarkdownReader"] = {}
+
+    def __call__(cls, *args: Any, **kwargs: Any):  # type: ignore[override]
         if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
+            cls._instances[cls] = super().__call__(*args, **kwargs)
         return cls._instances[cls]
 
 
-class Reader(object):
-    """Base reader class
-    """
+class Reader:
+    """Base reader class."""
 
-    regex = None
+    regex: Optional[re.Pattern[str]] = None
 
-    def read(self, path):
-        '''Read file'''
-        return NotImplemented
+    def read(self, path: Path | str) -> Optional[Dict[str, Any]]:
+        raise NotImplementedError
 
 
 class MarkdownReader(Reader, metaclass=Singleton):
-    """Markdown reader
-    """
+    """Markdown reader."""
 
-    regex = re.compile(r'([^/]+)\.(MD|md|[mM]arkdown)')
+    regex = re.compile(r"([^/]+)\.(md|markdown)$", re.IGNORECASE)
 
-    # Meta data parser
     _meta_parser = {
-        'tags': parser_list,
-        'category': parser_single,
-        'date': parser_date,
-        'publish': parser_bool,
-        'top': parser_bool,
-        'image': parser_single,
+        "tags": parser_list,
+        "category": parser_single,
+        "date": parser_date,
+        "publish": parser_bool,
+        "top": parser_bool,
+        "image": parser_single,
     }
 
-    def __init__(self):
-        self.md_parser = MarkdownReader.__create_md_reader()
+    def __init__(self) -> None:
+        self.md_parser = self._create_markdown_parser()
 
-    @classmethod
-    def __create_md_reader(cls):
-        """Create markdown parser
-        """
-
-        extensions = [
-            'markdown.extensions.fenced_code',  # Fenced Code Blocks
-            'markdown.extensions.codehilite',   # CodeHilite
-            'markdown.extensions.footnotes',    # Footnotes
-            'markdown.extensions.tables',       # Tables
-            'markdown.extensions.toc',          # Table of Contents
-            MetaYamlExtension(),                # Meta-YAML
-        ]
-
-        # Do not guess the code language
-        extension_configs = {'codehilite': [('guess_lang', False)]}
-
-        return markdown.Markdown(extensions=extensions,
-                                 extension_configs=extension_configs)
+    @staticmethod
+    def _create_markdown_parser() -> markdown.Markdown:
+        extensions: Iterable[Any] = (
+            "markdown.extensions.fenced_code",
+            "markdown.extensions.codehilite",
+            "markdown.extensions.footnotes",
+            "markdown.extensions.tables",
+            "markdown.extensions.toc",
+            MetaYamlExtension(),
+        )
+        extension_configs = {"codehilite": {"guess_lang": False}}
+        return markdown.Markdown(
+            extensions=extensions,
+            extension_configs=extension_configs,
+        )
 
     @property
-    def parser(self):
+    def parser(self) -> markdown.Markdown:
         return self.md_parser.reset()
 
-    def parse_meta(self, meta):
-        new_meta = {}
+    def parse_meta(self, meta: Dict[str, Any]) -> Dict[str, Any]:
+        parsed: Dict[str, Any] = {}
         for key, value in meta.items():
             parser = self._meta_parser.get(key, lambda v: v)
-            new_meta[key] = parser(value)
-        return new_meta
+            parsed[key] = parser(value)
+        return parsed
 
-    def read(self, path):
-        if not os.path.isfile(path):
-            # is not a file
+    def read(self, path: Path | str) -> Optional[Dict[str, Any]]:
+        file_path = Path(path)
+        if not file_path.is_file():
             return None
 
-        file_name = os.path.basename(path).split('.')[0]
-        res = {'slug': file_name}
+        file_name = file_path.stem
+        result: Dict[str, Any] = {"slug": file_name}
 
-        with open(path, 'r') as f:
-            draft = f.read()
-            content = self.parser.convert(draft.strip(' \n'))
+        draft = file_path.read_text(encoding="utf-8")
+        content = self.parser.convert(draft.strip(" \n"))
 
-        res.update({'content': content, 'raw': self.md_parser.Raw})
+        result.update({"content": content, "raw": self.md_parser.Raw})
         if self.md_parser.Meta:
             new_meta = self.parse_meta(self.md_parser.Meta)
-            res['title'] = new_meta.pop('title')
-            res['meta'] = new_meta
+            result["title"] = new_meta.pop("title", file_name)
+            result["meta"] = new_meta
 
-        return res
+        return result
 
 
-def reader_for_file(path):
-    """Get the reader instance for file path
-    """
-
-    file_name = os.path.basename(path)
+def reader_for_file(path: Path | str) -> Optional[Reader]:
+    file_name = Path(path).name
     for cls in Reader.__subclasses__():
-        if cls.regex and cls.regex.match(file_name):
-            logging.debug('Find reader {}'.format(cls))
+        pattern = cls.regex
+        if pattern and pattern.match(file_name):
+            logging.debug("Find reader %s", cls)
             return cls()
-
     return None
 
 
-def read(path):
-    """Read file at path
-    """
-
+def read(path: Path | str) -> Optional[Dict[str, Any]]:
     reader = reader_for_file(path)
     if not reader:
-        logging.debug('No reader found for file %s', path)
+        logging.debug("No reader found for file %s", path)
         return None
-
     return reader.read(path)
+

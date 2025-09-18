@@ -1,66 +1,57 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+"""Template utilities built on top of Jinja2."""
 
-"""Template"""
+from __future__ import annotations
 
-from os import path
+from pathlib import Path
+from typing import Any, Dict, Optional
 
 import jinja2
-from jinja2 import FileSystemLoader, ChoiceLoader
+from jinja2 import ChoiceLoader, FileSystemLoader
 from jinja2.exceptions import TemplateNotFound
 
-import peanut
 from peanut.utils import get_resource
 
 
 class SmartLoader(FileSystemLoader):
-    """A smart template loader"""
+    """FileSystemLoader that can resolve templates without extensions."""
 
-    available_extension = ['.html', '.xml']
+    available_extension = (".html", ".xml")
 
-    def get_source(self, environment, template):
+    def get_source(self, environment: jinja2.Environment, template: str):  # type: ignore[override]
         if template is None:
             raise TemplateNotFound(template)
-        if '.' in template:
-            return super(SmartLoader, self).get_source(environment, template)
+        if "." in template:
+            return super().get_source(environment, template)
 
         for extension in SmartLoader.available_extension:
+            filename = f"{template}{extension}"
             try:
-                filename = template + extension
-                return super(SmartLoader, self).get_source(environment, filename)
+                return super().get_source(environment, filename)
             except TemplateNotFound:
-                pass
-
+                continue
         raise TemplateNotFound(template)
 
 
-class Template(object):
-    """Template"""
+class Template:
+    """Wrapper around Jinja2 environment with Peanut defaults."""
 
-    def __init__(self, path, filters=None, **kwargs):
-        loader = ChoiceLoader([
-            SmartLoader(path),
-            SmartLoader(get_resource('themes/default')),
-        ])
+    def __init__(self, path: str | Path, filters: Optional[Dict[str, Any]] = None, **kwargs: Any) -> None:
+        search_paths = [str(Path(path)), str(get_resource("themes/default"))]
+        loader = ChoiceLoader([SmartLoader(p) for p in search_paths])
         self.env = jinja2.Environment(
             loader=loader,
             lstrip_blocks=True,
             trim_blocks=True,
         )
-        # Update filters
         if isinstance(filters, dict):
             self.env.filters.update(filters)
 
-        # Update global namesapce
         self.env.globals.update(kwargs)
 
-    def update_context(self, **kwargs):
-        """Update global context
-        """
+    def update_context(self, **kwargs: Any) -> None:
         self.env.globals.update(kwargs)
 
-    def render(self, name, **context):
-        """Render template with name and context
-        """
+    def render(self, name: str, **context: Any) -> str:
         template = self.env.get_template(name)
         return template.render(**context)
+

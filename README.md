@@ -1,4 +1,4 @@
- 一个静态博客生成工具，由[zqqf16.github.com](https://github.com/zqqf16/zqqf16.github.com)演变而来。
+一个静态博客生成工具，由 [zqqf16.github.com](https://github.com/zqqf16/zqqf16.github.com) 演变而来。
 
 ![CI Status](https://github.com/zqqf16/Peanut/actions/workflows/main.yml/badge.svg)
 
@@ -7,24 +7,36 @@
 
 ### 安装
 
-``` bash
-git clone https://github.com/zqqf16/Peanut.git
-cd peanut
-sudo python setup.py install #python version >= 3.x
+Peanut 现在需要 **Python 3.12 或更高版本**。
+
+```bash
+# 推荐使用 uv（https://github.com/astral-sh/uv）
+uv pip install .
+
+# 或使用标准 pip
+pip install .
 ```
+
+开发者可以一次性安装开发工具链：
+
+```bash
+pip install -e .[dev]
+```
+
+主要依赖：Jinja2、Markdown、Pygments、PyYAML、docopt、requests（完整列表见 `pyproject.toml`）。
 
 ### 使用
 
 #### 初始化
 
-``` bash
+```bash
 cd blog
 peanut init
 ```
 
 #### 写文章
 
-``` markdown
+```markdown
 ---
 title: Hello world
 tag: test
@@ -34,51 +46,43 @@ date: 2015-11-11
 Hello World!
 ```
 
-保存到 “drafts/hello_world.md”
+保存到 `drafts/hello_world.md`。
 
 #### 生成 HTML
 
-``` bash
-peanut                   
+```bash
+peanut
 👉  Loading configurations...
 👉  Verifing configurations...
 👉  Generating...
 👉  Loading drafts...
-🍻  1 posts total
+🎉  1 posts
 👉  Rendering files...
 ```
 
 #### 预览
 
-``` bash
-python -m SimpleHTTPServer
-```
-
-或:
-
-``` bash
+```bash
 python3 -m http.server
 ```
 
 #### 迁移到 Ghost
 
-``` bash
+```bash
 peanut ghost http://your_ghost.domain username password
 ```
 
-### 依赖
+### 开发辅助
 
-- Jinja2
-- Markdown
-- Pygments
-- PyYAML
-- docopt
+- 代码格式 & 静态检查：`ruff check .` / `ruff format .`
+- 类型检查：`mypy peanut`
+- 测试：`pytest`
 
 ### License
 
 The MIT License (MIT)
 
-Copyright (c) 2015-2022 zqqf16
+Copyright (c) 2015-2025 zqqf16
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

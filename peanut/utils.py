@@ -1,85 +1,80 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+"""Utility helpers used across Peanut."""
 
-import os
+from __future__ import annotations
+
 import re
-import builtins
+from os import PathLike
+from pathlib import Path
+from typing import Iterator, Optional, Sequence, Tuple, TypeVar, Union
+from urllib.parse import urljoin, urlsplit
+from urllib.request import pathname2url, url2pathname
 
-try:
-    from urllib.parse import urljoin, urlsplit
-    from urllib.request import pathname2url, url2pathname
-except:
-    from urlparse import urljoin, urlsplit
-    from urllib import pathname2url, url2pathname
+PathStr = Union[str, PathLike[str]]
+T = TypeVar("T")
 
-def to_s(value):
+
+def to_s(value: object) -> str:
+    """Return a string representation for logging/console output."""
     return str(value)
 
-def to_u(value):
+
+def to_u(value: object) -> str:
+    """Backward compatible unicode helper; identical to to_s on Python 3."""
     return str(value)
 
-def path_to_url(path):
-    return pathname2url(path)
 
-def url_to_path(url):
+def path_to_url(path: PathStr) -> str:
+    """Convert a filesystem path to a URL-compatible string."""
+    return pathname2url(str(path))
+
+
+def url_to_path(url: str) -> str:
+    """Convert a URL-encoded string back to a filesystem path."""
     return url2pathname(url)
 
-def url_safe(string):
-    new_str = re.sub(
-            r'[<>,~!#&\{\}\(\)\[\]\*\^\$\?]', ' ', string
-    )
 
-    return '-'.join(new_str.strip().split())
+def url_safe(value: str) -> str:
+    """Normalise a string for use inside URLs."""
+    cleaned = re.sub(r"[<>,~!#&{}()\[\]*^$?]", " ", value)
+    return "-".join(part for part in cleaned.strip().split())
 
-def real_url(base, url):
+
+def real_url(base: str, url: str) -> str:
+    """Compose an absolute URL from a base URL and a local path."""
     path = urlsplit(base).path
-    if not path.endswith('/'):
-        path = path + '/'
-    url = url.lstrip('/')
-    return urljoin(path, url)
-
-def package_resource(path):
-    """Get resource from package
-
-    @param path: the relative path of resource
-
-    @return: the absolute path of resource
-    """
-
-    curr_path = os.path.split(os.path.abspath(__file__))[0]
-    return os.path.abspath(os.path.join(curr_path, path))
+    if not path.endswith("/"):
+        path = f"{path}/"
+    relative = url.lstrip("/")
+    return urljoin(path, relative)
 
 
-def neighborhood(alist):
-    """Get neighborhood when looping"""
+def package_resource(path: PathStr) -> Path:
+    """Return an absolute path to a resource shipped inside the package."""
+    return (Path(__file__).resolve().parent / path).resolve()
 
-    length = len(alist)
-    if length == 0:
+
+def neighborhood(items: Sequence[T]) -> Iterator[Tuple[Optional[T], T, Optional[T]]]:
+    """Yield (prev, current, next) triples while iterating over *items*."""
+    if not items:
         return
 
-    prev = None
-    curr = None
-    next = None
-
-    for i, curr in enumerate(alist):
-        if i > 0:
-            prev = alist[i-1]
-        if i+1 < length:
-            next = alist[i+1]
-        yield (prev, curr, next)
-    yield (prev, curr, None)
+    last_index = len(items) - 1
+    for index, current in enumerate(items):
+        prev_item = items[index - 1] if index > 0 else None
+        next_item = items[index + 1] if index < last_index else None
+        yield prev_item, current, next_item
 
 
-def list_dir(path):
-    """List all unhidden files
-    """
-    for filename in os.listdir(path):
-        if filename.startswith('.'):
+def list_dir(path: PathStr) -> Iterator[str]:
+    """Yield all non-hidden files under *path* sorted alphabetically."""
+    directory = Path(path)
+    for entry in sorted(directory.iterdir()):
+        if entry.name.startswith(".") or entry.is_dir():
             continue
-        if os.path.isdir(filename):
-            continue
-        yield to_u(os.path.join(path, filename))
+        yield str(entry)
 
-def get_resource(relative_path):
-    package_path = os.path.abspath(os.path.split(__file__)[0])
-    return os.path.join(package_path, relative_path)
+
+def get_resource(relative_path: PathStr) -> Path:
+    """Return the absolute path of a resource bundled with Peanut."""
+    return package_resource(relative_path)
+

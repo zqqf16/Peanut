@@ -1,101 +1,46 @@
-"""
-# YAML Meta Data Extension for [Python-Markdown](https://github.com/waylan/Python-Markdown)
+"""YAML meta data extension for Python-Markdown."""
 
-This extension adds YAML meta data handling to markdown.
+from __future__ import annotations
 
-As in the original, meta data is parsed but not used in processing.
+from typing import List
 
-(YAML meta data is used e.g. by [pandoc](http://johnmacfarlane.net/pandoc/))
-
-Dependencies: [PyYAML](http://pyyaml.org/)
-
-
-Basic Usage:
-
-    >>> import markdown
-    >>> text = '''---
-    ... Title: Test Doc.
-    ... Author: Waylan Limberg
-    ... Blank_Data:
-    ... ...
-    ...
-    ... The body. This is paragraph one.
-    ... '''
-    >>> md = markdown.Markdown(['meta_yaml'])
-    >>> print(md.convert(text))
-    <p>The body. This is paragraph one.</p>
-    >>> print(md.Meta) # doctest: +SKIP
-    {'blank_data': [''], 'author': ['Waylan Limberg'], 'title': ['Test Doc.']}
-
-Make sure text without Meta Data still works (markdown < 1.6b returns a <p>).
-
-    >>> text = '    Some Code - not extra lines of meta data.'
-    >>> md = markdown.Markdown(['meta_yaml'])
-    >>> print(md.convert(text))
-    <pre><code>Some Code - not extra lines of meta data.
-    </code></pre>
-    >>> md.Meta
-    {}
-
-
-Copyright 2014 Bernhard Fisseni
-
-Based on the meta data extension included with Python-Markdown,
-Copyright 2007-2008 [Waylan Limberg](http://achinghead.com).
-
-License: BSD (see LICENSE.md for details)
-
-"""
-
-from __future__ import absolute_import
-from __future__ import unicode_literals
-from markdown import Extension
-from markdown.preprocessors import Preprocessor
 import yaml
+from markdown import Extension, Markdown
+from markdown.preprocessors import Preprocessor
 
 
-class MetaYamlExtension (Extension):
-    """Extension for parsing YAML-Metadata with Python-Markdown."""
+class MetaYamlExtension(Extension):
+    """Extension for parsing YAML metadata blocks."""
 
-    def extendMarkdown(self, md, md_globals):
-        """Add MetaYamlPreprocessor to Markdown instance."""
-        md.preprocessors.add("meta_yaml", MetaYamlPreprocessor(md), "_begin")
+    def extendMarkdown(self, md: Markdown) -> None:  # type: ignore[override]
+        md.preprocessors.register(MetaYamlPreprocessor(md), "meta_yaml", 25)
 
 
 class MetaYamlPreprocessor(Preprocessor):
-    """
-    Get Meta-Data.
+    """Extract YAML metadata from the beginning of a document."""
 
-    A YAML block is delimited by
-    - a line '---' at the start
-    - and a '...' or '---' line
-    at the end.
-    """
-
-    def run(self, lines):
-        """ Parse Meta-Data and store in Markdown.Meta. """
-        yaml_block = []
-        line = lines.pop(0)
-        if line == "---":
+    def run(self, lines: List[str]) -> List[str]:  # type: ignore[override]
+        yaml_block: List[str] = []
+        if lines and lines[0] == "---":
+            lines.pop(0)
             while lines:
                 line = lines.pop(0)
                 if line in ("---", "..."):
                     break
                 yaml_block.append(line)
-        else:
-            lines.insert(0, line)
         if yaml_block:
-            meta = yaml.safe_load("\n".join(yaml_block))
-
-            # Compat with PyMarkdown's meta: Keys are lowercase, values are lists
-            meta = {k.lower(): v for k, v in meta.items()}
-
+            meta = yaml.safe_load("\n".join(yaml_block)) or {}
+            meta = {str(k).lower(): v for k, v in meta.items()}
             self.md.Meta = meta
-            
-        self.md.Raw = '\n'.join(lines)
+        else:
+            self.md.Meta = {}
+
+        self.md.Raw = "\n".join(lines)
         return lines
 
 
-def makeExtension(configs={}):
-    """set up extension."""
-    return MetaYamlExtension(configs=configs)
+def makeExtension(configs: dict | None = None) -> MetaYamlExtension:
+    """Set up the extension (entry point for markdown)."""
+
+    return MetaYamlExtension(configs=configs or {})
+

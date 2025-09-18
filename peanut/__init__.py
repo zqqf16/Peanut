@@ -1,4 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+"""Peanut static blog generator."""
 
-version = '1.4.1'
+__all__ = ["__version__"]
+__version__ = "1.4.1"

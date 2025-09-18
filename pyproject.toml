@@ -1,0 +1,74 @@
+[build-system]
+requires = [
+    "setuptools>=69",
+    "wheel",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "peanut"
+version = "1.4.1"
+description = "A static blog generator"
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "zqqf16", email = "zqqf16@gmail.com" }]
+keywords = ["static", "blog", "generator"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Internet :: WWW/HTTP :: Site Management",
+    "Topic :: Software Development :: Code Generators",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "Jinja2>=3.1.1",
+    "Markdown>=3.3.6",
+    "Pygments>=2.11.2",
+    "PyYAML>=6.0",
+    "docopt>=0.6.2",
+    "requests>=2.27.1",
+]
+[project.urls]
+Homepage = "https://github.com/zqqf16/peanut"
+Issues = "https://github.com/zqqf16/peanut/issues"
+
+[project.scripts]
+peanut = "peanut.cmd:main"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.4",
+    "mypy>=1.7",
+]
+
+[tool.setuptools]
+include-package-data = true
+packages = ["peanut"]
+
+[tool.setuptools.package-data]
+peanut = [
+    "config.yml",
+    "themes/default/*.html",
+    "themes/default/*.xml",
+    "themes/default/assets/css/*.css",
+    "themes/default/assets/js/*.js",
+]
+
+[tool.ruff]
+line-length = 100
+src = ["peanut", "test"]
+indent-width = 4
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E203", "E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
