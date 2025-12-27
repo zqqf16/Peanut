@@ -4,3 +4,5 @@ Pygments>=2.11.2
 PyYAML>=6.0
 docopt>=0.6.2
 requests>=2.27.1
+urllib3>=2.2.2 # not directly required, pinned by Snyk to avoid a vulnerability
+zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
